@@ -1,0 +1,277 @@
+
+<div class="imagen-con-texto color-{{ section.settings.color_scheme }}">
+  <div class="imagen-con-texto__wrapper">
+
+    {%- if section.settings.image != blank -%}
+      {{
+        section.settings.image
+        | image_url: width: 1920
+        | image_tag:
+          class: 'imagen-con-texto__img',
+          widths: '750, 1100, 1500, 1920',
+          sizes: '100vw',
+          alt: section.settings.image.alt
+      }}
+    {%- else -%}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'imagen-con-texto__img imagen-con-texto__img--placeholder' }}
+    {%- endif -%}
+
+    {%- if section.settings.titulo != blank or section.settings.subtitulo != blank or section.settings.boton_texto != blank -%}
+      <div
+        class="imagen-con-texto__overlay imagen-con-texto__overlay--{{ section.settings.posicion_texto }}"
+        style="
+          --overlay-bg: {{ section.settings.fondo_overlay }};
+          --overlay-padding: {{ section.settings.padding_texto }}px;
+          color: {{ section.settings.color_texto }};
+          text-align: {{ section.settings.alineacion_texto }};
+        "
+      >
+        {%- if section.settings.titulo != blank -%}
+          <{{ section.settings.titulo_etiqueta }} class="imagen-con-texto__titulo">
+            {{ section.settings.titulo }}
+          </{{ section.settings.titulo_etiqueta }}>
+        {%- endif -%}
+
+        {%- if section.settings.subtitulo != blank -%}
+          <p class="imagen-con-texto__subtitulo">{{ section.settings.subtitulo }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.boton_texto != blank and section.settings.boton_link != blank -%}
+          <a
+            href="{{ section.settings.boton_link }}"
+            class="imagen-con-texto__boton button"
+            {% if section.settings.abrir_nueva_pestana %}target="_blank" rel="noopener"{% endif %}
+          >
+            {{ section.settings.boton_texto }}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</div>
+
+{% stylesheet %}
+  .imagen-con-texto {
+    width: 100%;
+  }
+
+  .imagen-con-texto__wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .imagen-con-texto__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .imagen-con-texto__img--placeholder svg {
+    width: 100%;
+    height: 400px;
+    display: block;
+  }
+
+  .imagen-con-texto__overlay {
+    position: absolute;
+    padding: var(--overlay-padding, 24px);
+    background-color: var(--overlay-bg, transparent);
+    max-width: 80%;
+  }
+
+  /* Posiciones del texto */
+  .imagen-con-texto__overlay--centro {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .imagen-con-texto__overlay--arriba-izquierda {
+    top: 5%;
+    left: 3%;
+  }
+  .imagen-con-texto__overlay--arriba-centro {
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .imagen-con-texto__overlay--arriba-derecha {
+    top: 5%;
+    right: 3%;
+  }
+  .imagen-con-texto__overlay--abajo-izquierda {
+    bottom: 5%;
+    left: 3%;
+  }
+  .imagen-con-texto__overlay--abajo-centro {
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .imagen-con-texto__overlay--abajo-derecha {
+    bottom: 5%;
+    right: 3%;
+  }
+
+  .imagen-con-texto__titulo {
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+  }
+
+  .imagen-con-texto__subtitulo {
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  .imagen-con-texto__boton {
+    display: inline-block;
+    margin-top: 0.75rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Imagen con texto",
+  "tag": "section",
+  "class": "section-wrapper",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Imagen de fondo"
+    },
+    {
+      "type": "header",
+      "content": "Texto sobre la imagen"
+    },
+    {
+      "type": "text",
+      "id": "titulo",
+      "label": "Título",
+      "default": "Tu título aquí"
+    },
+    {
+      "type": "select",
+      "id": "titulo_etiqueta",
+      "label": "Tamaño del título",
+      "options": [
+        { "value": "h1", "label": "Extra grande (H1)" },
+        { "value": "h2", "label": "Grande (H2)" },
+        { "value": "h3", "label": "Mediano (H3)" },
+        { "value": "h4", "label": "Pequeño (H4)" }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitulo",
+      "label": "Subtítulo / Descripción",
+      "default": "Escribe aquí tu descripción"
+    },
+    {
+      "type": "header",
+      "content": "Estilo del texto"
+    },
+    {
+      "type": "color",
+      "id": "color_texto",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "alineacion_texto",
+      "label": "Alineación del texto",
+      "options": [
+        { "value": "left", "label": "Izquierda" },
+        { "value": "center", "label": "Centro" },
+        { "value": "right", "label": "Derecha" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "posicion_texto",
+      "label": "Posición del texto",
+      "options": [
+        { "value": "centro", "label": "Centro" },
+        { "value": "arriba-izquierda", "label": "Arriba izquierda" },
+        { "value": "arriba-centro", "label": "Arriba centro" },
+        { "value": "arriba-derecha", "label": "Arriba derecha" },
+        { "value": "abajo-izquierda", "label": "Abajo izquierda" },
+        { "value": "abajo-centro", "label": "Abajo centro" },
+        { "value": "abajo-derecha", "label": "Abajo derecha" }
+      ],
+      "default": "centro"
+    },
+    {
+      "type": "color",
+      "id": "fondo_overlay",
+      "label": "Color de fondo del texto",
+      "info": "Usa transparente para sin fondo",
+      "default": "#00000000"
+    },
+    {
+      "type": "range",
+      "id": "padding_texto",
+      "label": "Espaciado interno del texto",
+      "min": 0,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "text",
+      "id": "boton_texto",
+      "label": "Texto del botón"
+    },
+    {
+      "type": "url",
+      "id": "boton_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "checkbox",
+      "id": "abrir_nueva_pestana",
+      "label": "Abrir en nueva pestaña",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Colores de sección"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de color",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Imagen con texto",
+      "settings": {
+        "titulo": "Tu título aquí",
+        "subtitulo": "Escribe aquí tu descripción",
+        "posicion_texto": "centro",
+        "color_texto": "#ffffff",
+        "alineacion_texto": "center"
+      }
+    }
+  ]
+}
+{% endschema %}
