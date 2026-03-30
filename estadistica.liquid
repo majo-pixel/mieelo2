@@ -1,6 +1,6 @@
 
 <div
-  class="estadistica-block color-{{ block.settings.color_scheme }}"
+  class="estadistica-block color-{{ block.settings.color_scheme }}{% if block.settings.ocultar_movil %} estadistica-block--ocultar-movil{% endif %}"
   style="
     background-color: {{ block.settings.fondo }};
     border: {{ block.settings.borde_grosor }}px solid {{ block.settings.borde_color }};
@@ -29,6 +29,12 @@
     display: inline-flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    .estadistica-block--ocultar-movil {
+      display: none;
+    }
   }
 {% endstylesheet %}
 
@@ -167,6 +173,17 @@
         { "value": "right", "label": "Derecha" }
       ],
       "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Visibilidad"
+    },
+    {
+      "type": "checkbox",
+      "id": "ocultar_movil",
+      "label": "Ocultar en móvil",
+      "default": true,
+      "info": "Las estadísticas no se mostrarán en pantallas pequeñas"
     },
     {
       "type": "color_scheme",
