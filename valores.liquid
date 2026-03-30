@@ -144,12 +144,12 @@
 
   .valores__item {
     padding-block: 1.75rem;
-    border-top: 1px solid currentColor;
+    border-top: {{ section.settings.linea_grosor }}px solid {{ section.settings.linea_color }};
     opacity: 0.9;
   }
 
   .valores__item:last-child {
-    border-bottom: 1px solid currentColor;
+    border-bottom: {{ section.settings.linea_grosor }}px solid {{ section.settings.linea_color }};
   }
 
   .valores__item-top {
@@ -530,6 +530,26 @@
       "id": "boton_nueva_pestana",
       "label": "Abrir en nueva pestaña",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Líneas divisoras"
+    },
+    {
+      "type": "color",
+      "id": "linea_color",
+      "label": "Color de las líneas",
+      "default": "#CCCCCC"
+    },
+    {
+      "type": "range",
+      "id": "linea_grosor",
+      "label": "Grosor de las líneas",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 1
     },
     {
       "type": "header",
