@@ -9,14 +9,24 @@
     {%- comment -%} Columna izquierda {%- endcomment -%}
     <div class="valores__left">
       {%- if section.settings.etiqueta != blank -%}
-        <p class="valores__etiqueta">{{ section.settings.etiqueta }}</p>
+        <p class="valores__etiqueta" style="
+          font-size: {{ section.settings.etiqueta_tamano }};
+          color: {{ section.settings.etiqueta_color }};
+          font-weight: {{ section.settings.etiqueta_peso }};
+          font-family: {{ section.settings.etiqueta_fuente }};
+        ">{{ section.settings.etiqueta }}</p>
       {%- endif -%}
 
       {%- if section.settings.titulo != blank -%}
-        <h2 class="valores__titulo">
+        <h2 class="valores__titulo" style="
+          font-size: {{ section.settings.titulo_tamano }};
+          color: {{ section.settings.titulo_color }};
+          font-weight: {{ section.settings.titulo_peso }};
+          font-family: {{ section.settings.titulo_fuente }};
+        ">
           {%- assign partes = section.settings.titulo | split: section.settings.palabra_destacada -%}
           {%- if section.settings.palabra_destacada != blank and partes.size > 1 -%}
-            {{ partes[0] }}<span class="valores__titulo--destacado" style="color: {{ section.settings.color_destacado }};">{{ section.settings.palabra_destacada }}</span>{{ partes[1] }}
+            {{ partes[0] }}<span style="color: {{ section.settings.color_destacado }}; font-style: italic;">{{ section.settings.palabra_destacada }}</span>{{ partes[1] }}
           {%- else -%}
             {{ section.settings.titulo }}
           {%- endif -%}
@@ -24,7 +34,12 @@
       {%- endif -%}
 
       {%- if section.settings.descripcion != blank -%}
-        <p class="valores__descripcion">{{ section.settings.descripcion }}</p>
+        <p class="valores__descripcion" style="
+          font-size: {{ section.settings.descripcion_tamano }};
+          color: {{ section.settings.descripcion_color }};
+          font-weight: {{ section.settings.descripcion_peso }};
+          font-family: {{ section.settings.descripcion_fuente }};
+        ">{{ section.settings.descripcion }}</p>
       {%- endif -%}
 
       {%- if section.settings.boton_texto != blank and section.settings.boton_link != blank -%}
@@ -38,23 +53,38 @@
       {%- endif -%}
     </div>
 
-    {%- comment -%} Columna derecha — lista de valores {%- endcomment -%}
+    {%- comment -%} Columna derecha {%- endcomment -%}
     <div class="valores__right">
       {%- for block in section.blocks -%}
         <div class="valores__item" {{ block.shopify_attributes }}>
           <div class="valores__item-top">
             {%- if block.settings.numero != blank or block.settings.categoria != blank -%}
-              <p class="valores__item-meta" style="color: {{ section.settings.color_destacado }};">
+              <p class="valores__item-meta" style="
+                color: {{ block.settings.meta_color }};
+                font-size: {{ block.settings.meta_tamano }};
+                font-weight: {{ block.settings.meta_peso }};
+                font-family: {{ block.settings.meta_fuente }};
+              ">
                 {%- if block.settings.numero != blank -%}{{ block.settings.numero }}{%- endif -%}
                 {%- if block.settings.numero != blank and block.settings.categoria != blank -%} — {%- endif -%}
                 {%- if block.settings.categoria != blank -%}{{ block.settings.categoria }}{%- endif -%}
               </p>
             {%- endif -%}
             {%- if block.settings.titulo != blank -%}
-              <h3 class="valores__item-titulo">{{ block.settings.titulo }}</h3>
+              <h3 class="valores__item-titulo" style="
+                font-size: {{ block.settings.titulo_tamano }};
+                color: {{ block.settings.titulo_color }};
+                font-weight: {{ block.settings.titulo_peso }};
+                font-family: {{ block.settings.titulo_fuente }};
+              ">{{ block.settings.titulo }}</h3>
             {%- endif -%}
             {%- if block.settings.descripcion != blank -%}
-              <p class="valores__item-descripcion">{{ block.settings.descripcion }}</p>
+              <p class="valores__item-descripcion" style="
+                font-size: {{ block.settings.desc_tamano }};
+                color: {{ block.settings.desc_color }};
+                font-weight: {{ block.settings.desc_peso }};
+                font-family: {{ block.settings.desc_fuente }};
+              ">{{ block.settings.descripcion }}</p>
             {%- endif -%}
           </div>
         </div>
@@ -86,28 +116,20 @@
   }
 
   .valores__etiqueta {
-    font-size: 0.75rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     margin: 0;
-    opacity: 0.7;
   }
 
   .valores__titulo {
-    font-size: clamp(2rem, 4vw, 3rem);
     line-height: 1.1;
     margin: 0;
-  }
-
-  .valores__titulo--destacado {
-    font-style: italic;
   }
 
   .valores__descripcion {
     line-height: 1.7;
     margin: 0;
     max-width: 480px;
-    opacity: 0.85;
   }
 
   .valores__boton {
@@ -137,23 +159,18 @@
   }
 
   .valores__item-meta {
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
     margin: 0;
     font-style: italic;
+    letter-spacing: 0.05em;
   }
 
   .valores__item-titulo {
-    font-size: 1rem;
-    font-weight: 600;
     margin: 0;
   }
 
   .valores__item-descripcion {
-    font-size: 0.9rem;
     line-height: 1.6;
     margin: 0.25rem 0 0;
-    opacity: 0.8;
   }
 {% endstylesheet %}
 
@@ -184,16 +201,148 @@
           "default": "Craft"
         },
         {
+          "type": "header",
+          "content": "Tipografía — Número/Categoría"
+        },
+        {
+          "type": "color",
+          "id": "meta_color",
+          "label": "Color",
+          "default": "#C97B5A"
+        },
+        {
+          "type": "select",
+          "id": "meta_tamano",
+          "label": "Tamaño",
+          "options": [
+            { "value": "0.7rem", "label": "11px" },
+            { "value": "0.75rem", "label": "12px" },
+            { "value": "0.875rem", "label": "14px" },
+            { "value": "1rem", "label": "16px" }
+          ],
+          "default": "0.75rem"
+        },
+        {
+          "type": "select",
+          "id": "meta_peso",
+          "label": "Peso",
+          "options": [
+            { "value": "400", "label": "Normal" },
+            { "value": "600", "label": "Semi-negrita" },
+            { "value": "700", "label": "Negrita" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "select",
+          "id": "meta_fuente",
+          "label": "Fuente",
+          "options": [
+            { "value": "var(--font-body--family)", "label": "Cuerpo" },
+            { "value": "var(--font-heading--family)", "label": "Título" },
+            { "value": "var(--font-accent--family)", "label": "Acento" }
+          ],
+          "default": "var(--font-body--family)"
+        },
+        {
           "type": "text",
           "id": "titulo",
-          "label": "Título",
+          "label": "Título del valor",
           "default": "Skill before sentiment"
+        },
+        {
+          "type": "header",
+          "content": "Tipografía — Título"
+        },
+        {
+          "type": "color",
+          "id": "titulo_color",
+          "label": "Color",
+          "default": "#2C2C2C"
+        },
+        {
+          "type": "select",
+          "id": "titulo_tamano",
+          "label": "Tamaño",
+          "options": [
+            { "value": "0.875rem", "label": "14px" },
+            { "value": "1rem", "label": "16px" },
+            { "value": "1.125rem", "label": "18px" },
+            { "value": "1.25rem", "label": "20px" },
+            { "value": "1.5rem", "label": "24px" }
+          ],
+          "default": "1rem"
+        },
+        {
+          "type": "select",
+          "id": "titulo_peso",
+          "label": "Peso",
+          "options": [
+            { "value": "400", "label": "Normal" },
+            { "value": "600", "label": "Semi-negrita" },
+            { "value": "700", "label": "Negrita" }
+          ],
+          "default": "600"
+        },
+        {
+          "type": "select",
+          "id": "titulo_fuente",
+          "label": "Fuente",
+          "options": [
+            { "value": "var(--font-body--family)", "label": "Cuerpo" },
+            { "value": "var(--font-heading--family)", "label": "Título" },
+            { "value": "var(--font-accent--family)", "label": "Acento" }
+          ],
+          "default": "var(--font-heading--family)"
         },
         {
           "type": "textarea",
           "id": "descripcion",
           "label": "Descripción",
           "default": "Our makers are trained textile artisans — screen printers, seamstresses, designers. Their expertise is the product."
+        },
+        {
+          "type": "header",
+          "content": "Tipografía — Descripción"
+        },
+        {
+          "type": "color",
+          "id": "desc_color",
+          "label": "Color",
+          "default": "#555555"
+        },
+        {
+          "type": "select",
+          "id": "desc_tamano",
+          "label": "Tamaño",
+          "options": [
+            { "value": "0.75rem", "label": "12px" },
+            { "value": "0.875rem", "label": "14px" },
+            { "value": "1rem", "label": "16px" },
+            { "value": "1.125rem", "label": "18px" }
+          ],
+          "default": "0.875rem"
+        },
+        {
+          "type": "select",
+          "id": "desc_peso",
+          "label": "Peso",
+          "options": [
+            { "value": "400", "label": "Normal" },
+            { "value": "600", "label": "Semi-negrita" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "select",
+          "id": "desc_fuente",
+          "label": "Fuente",
+          "options": [
+            { "value": "var(--font-body--family)", "label": "Cuerpo" },
+            { "value": "var(--font-heading--family)", "label": "Título" },
+            { "value": "var(--font-accent--family)", "label": "Acento" }
+          ],
+          "default": "var(--font-body--family)"
         }
       ]
     }
@@ -201,25 +350,68 @@
   "settings": [
     {
       "type": "header",
-      "content": "Columna izquierda"
+      "content": "Etiqueta superior"
     },
     {
       "type": "text",
       "id": "etiqueta",
-      "label": "Etiqueta superior",
+      "label": "Texto",
       "default": "WHAT WE STAND FOR"
+    },
+    {
+      "type": "color",
+      "id": "etiqueta_color",
+      "label": "Color",
+      "default": "#888888"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" }
+      ],
+      "default": "0.75rem"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_peso",
+      "label": "Peso",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Título principal"
     },
     {
       "type": "textarea",
       "id": "titulo",
-      "label": "Título principal",
+      "label": "Texto",
       "default": "Not bags.\nOpportunities\nwith handles."
     },
     {
       "type": "text",
       "id": "palabra_destacada",
       "label": "Palabra con color destacado",
-      "info": "Escribe exactamente la palabra o frase que quieres colorear",
       "default": "Opportunities"
     },
     {
@@ -229,21 +421,109 @@
       "default": "#C97B5A"
     },
     {
+      "type": "color",
+      "id": "titulo_color",
+      "label": "Color del título",
+      "default": "#2C2C2C"
+    },
+    {
+      "type": "select",
+      "id": "titulo_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "1.5rem", "label": "24px" },
+        { "value": "2rem", "label": "32px" },
+        { "value": "2.5rem", "label": "40px" },
+        { "value": "3rem", "label": "48px" },
+        { "value": "3.5rem", "label": "56px" },
+        { "value": "clamp(2rem, 4vw, 3rem)", "label": "Fluido (recomendado)" }
+      ],
+      "default": "clamp(2rem, 4vw, 3rem)"
+    },
+    {
+      "type": "select",
+      "id": "titulo_peso",
+      "label": "Peso",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "titulo_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-heading--family)"
+    },
+    {
+      "type": "header",
+      "content": "Descripción"
+    },
+    {
       "type": "textarea",
       "id": "descripcion",
-      "label": "Párrafo descriptivo",
+      "label": "Texto",
       "default": "mi eelo was born within the community surrounding the largest landfill in Central America. We don't tell a story of hardship — we tell a story of skill, agency, and craft."
+    },
+    {
+      "type": "color",
+      "id": "descripcion_color",
+      "label": "Color",
+      "default": "#555555"
+    },
+    {
+      "type": "select",
+      "id": "descripcion_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" },
+        { "value": "1.125rem", "label": "18px" }
+      ],
+      "default": "1rem"
+    },
+    {
+      "type": "select",
+      "id": "descripcion_peso",
+      "label": "Peso",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "descripcion_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Botón"
     },
     {
       "type": "text",
       "id": "boton_texto",
-      "label": "Texto del botón",
+      "label": "Texto",
       "default": "SEE THE IMPACT"
     },
     {
       "type": "url",
       "id": "boton_link",
-      "label": "Enlace del botón"
+      "label": "Enlace"
     },
     {
       "type": "checkbox",
@@ -253,12 +533,12 @@
     },
     {
       "type": "header",
-      "content": "Estilo"
+      "content": "Estilo de sección"
     },
     {
       "type": "select",
       "id": "section_width",
-      "label": "Ancho de sección",
+      "label": "Ancho",
       "options": [
         { "value": "page-width", "label": "Página" },
         { "value": "full-width", "label": "Completo" }
