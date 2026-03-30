@@ -1,0 +1,493 @@
+
+<div class="equipo-wrapper">
+  <div class="equipo__imagen">
+    {%- if section.settings.imagen != blank -%}
+      {{
+        section.settings.imagen
+        | image_url: width: 1200
+        | image_tag:
+          class: 'equipo__img',
+          widths: '600, 900, 1200',
+          sizes: '50vw',
+          alt: section.settings.imagen.alt
+      }}
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'equipo__img equipo__img--placeholder' }}
+    {%- endif -%}
+  </div>
+
+  <div class="equipo__contenido" style="background-color: {{ section.settings.fondo_color }};">
+    {%- if section.settings.etiqueta != blank -%}
+      <p class="equipo__etiqueta" style="
+        color: {{ section.settings.etiqueta_color }};
+        font-size: {{ section.settings.etiqueta_tamano }};
+        font-family: {{ section.settings.etiqueta_fuente }};
+      ">{{ section.settings.etiqueta }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.titulo != blank -%}
+      <h2 class="equipo__titulo" style="
+        color: {{ section.settings.titulo_color }};
+        font-size: {{ section.settings.titulo_tamano }};
+        font-family: {{ section.settings.titulo_fuente }};
+        font-weight: {{ section.settings.titulo_peso }};
+      ">
+        {%- assign partes = section.settings.titulo | split: section.settings.palabra_destacada -%}
+        {%- if section.settings.palabra_destacada != blank and partes.size > 1 -%}
+          {{ partes[0] }}<em style="color: {{ section.settings.color_destacado }}; font-style: italic;">{{ section.settings.palabra_destacada }}</em>{{ partes[1] }}
+        {%- else -%}
+          {{ section.settings.titulo }}
+        {%- endif -%}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.descripcion != blank -%}
+      <p class="equipo__descripcion" style="
+        color: {{ section.settings.descripcion_color }};
+        font-size: {{ section.settings.descripcion_tamano }};
+        font-family: {{ section.settings.descripcion_fuente }};
+      ">{{ section.settings.descripcion }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.etiquetas != blank -%}
+      <div class="equipo__tags">
+        {%- assign tags = section.settings.etiquetas | split: ',' -%}
+        {%- for tag in tags -%}
+          <span class="equipo__tag" style="
+            color: {{ section.settings.tag_color }};
+            border-color: {{ section.settings.tag_borde_color }};
+            font-size: {{ section.settings.tag_tamano }};
+          ">{{ tag | strip }}</span>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="equipo__stats">
+        {%- for block in section.blocks -%}
+          <div class="equipo__stat" {{ block.shopify_attributes }}>
+            {%- if block.settings.numero != blank -%}
+              <p class="equipo__stat-numero" style="
+                color: {{ block.settings.numero_color }};
+                font-size: {{ block.settings.numero_tamano }};
+                font-family: {{ block.settings.numero_fuente }};
+                font-weight: {{ block.settings.numero_peso }};
+              ">{{ block.settings.numero }}</p>
+            {%- endif -%}
+            {%- if block.settings.label != blank -%}
+              <p class="equipo__stat-label" style="
+                color: {{ block.settings.label_color }};
+                font-size: {{ block.settings.label_tamano }};
+              ">{{ block.settings.label }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .equipo-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 500px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .equipo-wrapper {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .equipo__imagen {
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+  }
+
+  .equipo__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .equipo__img--placeholder svg {
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+  }
+
+  .equipo__contenido {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 3rem 3.5rem;
+  }
+
+  @media screen and (max-width: 749px) {
+    .equipo__contenido {
+      padding: 2.5rem 1.5rem;
+    }
+  }
+
+  .equipo__etiqueta {
+    margin: 0;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .equipo__titulo {
+    margin: 0;
+    line-height: 1.15;
+  }
+
+  .equipo__descripcion {
+    margin: 0;
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  .equipo__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .equipo__tag {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .equipo__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 0.5rem;
+  }
+
+  .equipo__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .equipo__stat-numero {
+    margin: 0;
+    line-height: 1;
+  }
+
+  .equipo__stat-label {
+    margin: 0;
+    line-height: 1.4;
+    max-width: 140px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Equipo / Imagen + Contenido",
+  "tag": "section",
+  "class": "section-wrapper",
+  "max_blocks": 6,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Estadística",
+      "settings": [
+        {
+          "type": "text",
+          "id": "numero",
+          "label": "Número",
+          "default": "30+"
+        },
+        {
+          "type": "color",
+          "id": "numero_color",
+          "label": "Color del número",
+          "default": "#C97B5A"
+        },
+        {
+          "type": "select",
+          "id": "numero_tamano",
+          "label": "Tamaño del número",
+          "options": [
+            { "value": "1.5rem", "label": "24px" },
+            { "value": "2rem", "label": "32px" },
+            { "value": "2.5rem", "label": "40px" },
+            { "value": "3rem", "label": "48px" }
+          ],
+          "default": "2rem"
+        },
+        {
+          "type": "select",
+          "id": "numero_fuente",
+          "label": "Fuente del número",
+          "options": [
+            { "value": "var(--font-body--family)", "label": "Cuerpo" },
+            { "value": "var(--font-heading--family)", "label": "Título" },
+            { "value": "var(--font-accent--family)", "label": "Acento" }
+          ],
+          "default": "var(--font-heading--family)"
+        },
+        {
+          "type": "select",
+          "id": "numero_peso",
+          "label": "Peso",
+          "options": [
+            { "value": "400", "label": "Normal" },
+            { "value": "600", "label": "Semi-negrita" },
+            { "value": "700", "label": "Negrita" }
+          ],
+          "default": "400"
+        },
+        {
+          "type": "textarea",
+          "id": "label",
+          "label": "Descripción",
+          "default": "Women in the sewing workshop"
+        },
+        {
+          "type": "color",
+          "id": "label_color",
+          "label": "Color descripción",
+          "default": "#cccccc"
+        },
+        {
+          "type": "select",
+          "id": "label_tamano",
+          "label": "Tamaño descripción",
+          "options": [
+            { "value": "0.75rem", "label": "12px" },
+            { "value": "0.875rem", "label": "14px" },
+            { "value": "1rem", "label": "16px" }
+          ],
+          "default": "0.875rem"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Imagen"
+    },
+    {
+      "type": "image_picker",
+      "id": "imagen",
+      "label": "Imagen"
+    },
+    {
+      "type": "header",
+      "content": "Fondo del contenido"
+    },
+    {
+      "type": "color",
+      "id": "fondo_color",
+      "label": "Color de fondo",
+      "default": "#2E4A5C"
+    },
+    {
+      "type": "header",
+      "content": "Etiqueta superior"
+    },
+    {
+      "type": "text",
+      "id": "etiqueta",
+      "label": "Texto",
+      "default": "OUR TEAM"
+    },
+    {
+      "type": "color",
+      "id": "etiqueta_color",
+      "label": "Color",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "textarea",
+      "id": "titulo",
+      "label": "Texto",
+      "default": "Run by women, for every woman who comes next."
+    },
+    {
+      "type": "text",
+      "id": "palabra_destacada",
+      "label": "Palabra con color destacado",
+      "default": "every woman"
+    },
+    {
+      "type": "color",
+      "id": "color_destacado",
+      "label": "Color destacado",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "color",
+      "id": "titulo_color",
+      "label": "Color del título",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "titulo_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "1.5rem", "label": "24px" },
+        { "value": "2rem", "label": "32px" },
+        { "value": "2.5rem", "label": "40px" },
+        { "value": "clamp(2rem, 3.5vw, 3rem)", "label": "Fluido (recomendado)" }
+      ],
+      "default": "clamp(2rem, 3.5vw, 3rem)"
+    },
+    {
+      "type": "select",
+      "id": "titulo_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-heading--family)"
+    },
+    {
+      "type": "select",
+      "id": "titulo_peso",
+      "label": "Peso",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Descripción"
+    },
+    {
+      "type": "textarea",
+      "id": "descripcion",
+      "label": "Texto",
+      "default": "mi eelo is a business, not a charity. Our 65-woman team runs production, handles orders, trains the next cohort, and keeps the quality uncompromising."
+    },
+    {
+      "type": "color",
+      "id": "descripcion_color",
+      "label": "Color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "select",
+      "id": "descripcion_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" },
+        { "value": "1.125rem", "label": "18px" }
+      ],
+      "default": "1rem"
+    },
+    {
+      "type": "select",
+      "id": "descripcion_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Etiquetas / Tags"
+    },
+    {
+      "type": "textarea",
+      "id": "etiquetas",
+      "label": "Etiquetas separadas por coma",
+      "info": "Ej: CREATORS, DESIGNERS, ARTISANS",
+      "default": "CREATORS, DESIGNERS, SCREEN PRINTERS, SEAMSTRESSES, ARTISANS, PRODUCERS, WORKERS"
+    },
+    {
+      "type": "color",
+      "id": "tag_color",
+      "label": "Color del texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "tag_borde_color",
+      "label": "Color del borde",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "tag_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Equipo / Imagen + Contenido",
+      "blocks": [
+        {
+          "type": "stat",
+          "settings": {
+            "numero": "30+",
+            "label": "Women in the sewing workshop"
+          }
+        },
+        {
+          "type": "stat",
+          "settings": {
+            "numero": "35+",
+            "label": "Artisans in production"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
