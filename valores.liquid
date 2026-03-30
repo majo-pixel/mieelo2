@@ -1,0 +1,310 @@
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="valores section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }} spacing-style"
+  style="{% render 'spacing-style', settings: section.settings %}"
+>
+  <div class="valores__grid">
+
+    {%- comment -%} Columna izquierda {%- endcomment -%}
+    <div class="valores__left">
+      {%- if section.settings.etiqueta != blank -%}
+        <p class="valores__etiqueta">{{ section.settings.etiqueta }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.titulo != blank -%}
+        <h2 class="valores__titulo">
+          {%- assign partes = section.settings.titulo | split: section.settings.palabra_destacada -%}
+          {%- if section.settings.palabra_destacada != blank and partes.size > 1 -%}
+            {{ partes[0] }}<span class="valores__titulo--destacado" style="color: {{ section.settings.color_destacado }};">{{ section.settings.palabra_destacada }}</span>{{ partes[1] }}
+          {%- else -%}
+            {{ section.settings.titulo }}
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.descripcion != blank -%}
+        <p class="valores__descripcion">{{ section.settings.descripcion }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.boton_texto != blank and section.settings.boton_link != blank -%}
+        <a
+          href="{{ section.settings.boton_link }}"
+          class="valores__boton button-secondary"
+          {% if section.settings.boton_nueva_pestana %}target="_blank" rel="noopener"{% endif %}
+        >
+          {{ section.settings.boton_texto }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Columna derecha — lista de valores {%- endcomment -%}
+    <div class="valores__right">
+      {%- for block in section.blocks -%}
+        <div class="valores__item" {{ block.shopify_attributes }}>
+          <div class="valores__item-top">
+            {%- if block.settings.numero != blank or block.settings.categoria != blank -%}
+              <p class="valores__item-meta" style="color: {{ section.settings.color_destacado }};">
+                {%- if block.settings.numero != blank -%}{{ block.settings.numero }}{%- endif -%}
+                {%- if block.settings.numero != blank and block.settings.categoria != blank -%} — {%- endif -%}
+                {%- if block.settings.categoria != blank -%}{{ block.settings.categoria }}{%- endif -%}
+              </p>
+            {%- endif -%}
+            {%- if block.settings.titulo != blank -%}
+              <h3 class="valores__item-titulo">{{ block.settings.titulo }}</h3>
+            {%- endif -%}
+            {%- if block.settings.descripcion != blank -%}
+              <p class="valores__item-descripcion">{{ block.settings.descripcion }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+{% stylesheet %}
+  .valores__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .valores__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  .valores__left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .valores__etiqueta {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0.7;
+  }
+
+  .valores__titulo {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .valores__titulo--destacado {
+    font-style: italic;
+  }
+
+  .valores__descripcion {
+    line-height: 1.7;
+    margin: 0;
+    max-width: 480px;
+    opacity: 0.85;
+  }
+
+  .valores__boton {
+    display: inline-block;
+    align-self: flex-start;
+  }
+
+  .valores__right {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .valores__item {
+    padding-block: 1.75rem;
+    border-top: 1px solid currentColor;
+    opacity: 0.9;
+  }
+
+  .valores__item:last-child {
+    border-bottom: 1px solid currentColor;
+  }
+
+  .valores__item-top {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .valores__item-meta {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    margin: 0;
+    font-style: italic;
+  }
+
+  .valores__item-titulo {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .valores__item-descripcion {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0.25rem 0 0;
+    opacity: 0.8;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Valores / Misión",
+  "tag": "section",
+  "class": "section-wrapper",
+  "max_blocks": 6,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "valor",
+      "name": "Valor",
+      "settings": [
+        {
+          "type": "text",
+          "id": "numero",
+          "label": "Número",
+          "default": "01"
+        },
+        {
+          "type": "text",
+          "id": "categoria",
+          "label": "Categoría",
+          "default": "Craft"
+        },
+        {
+          "type": "text",
+          "id": "titulo",
+          "label": "Título",
+          "default": "Skill before sentiment"
+        },
+        {
+          "type": "textarea",
+          "id": "descripcion",
+          "label": "Descripción",
+          "default": "Our makers are trained textile artisans — screen printers, seamstresses, designers. Their expertise is the product."
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Columna izquierda"
+    },
+    {
+      "type": "text",
+      "id": "etiqueta",
+      "label": "Etiqueta superior",
+      "default": "WHAT WE STAND FOR"
+    },
+    {
+      "type": "textarea",
+      "id": "titulo",
+      "label": "Título principal",
+      "default": "Not bags.\nOpportunities\nwith handles."
+    },
+    {
+      "type": "text",
+      "id": "palabra_destacada",
+      "label": "Palabra con color destacado",
+      "info": "Escribe exactamente la palabra o frase que quieres colorear",
+      "default": "Opportunities"
+    },
+    {
+      "type": "color",
+      "id": "color_destacado",
+      "label": "Color destacado",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "textarea",
+      "id": "descripcion",
+      "label": "Párrafo descriptivo",
+      "default": "mi eelo was born within the community surrounding the largest landfill in Central America. We don't tell a story of hardship — we tell a story of skill, agency, and craft."
+    },
+    {
+      "type": "text",
+      "id": "boton_texto",
+      "label": "Texto del botón",
+      "default": "SEE THE IMPACT"
+    },
+    {
+      "type": "url",
+      "id": "boton_link",
+      "label": "Enlace del botón"
+    },
+    {
+      "type": "checkbox",
+      "id": "boton_nueva_pestana",
+      "label": "Abrir en nueva pestaña",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Estilo"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Ancho de sección",
+      "options": [
+        { "value": "page-width", "label": "Página" },
+        { "value": "full-width", "label": "Completo" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de color",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Valores / Misión",
+      "blocks": [
+        {
+          "type": "valor",
+          "settings": {
+            "numero": "01",
+            "categoria": "Craft",
+            "titulo": "Skill before sentiment",
+            "descripcion": "Our makers are trained textile artisans — screen printers, seamstresses, designers. Their expertise is the product."
+          }
+        },
+        {
+          "type": "valor",
+          "settings": {
+            "numero": "02",
+            "categoria": "Agency",
+            "titulo": "Women who decide",
+            "descripcion": "The mi eelo team designs, produces, and delivers. Income, flexibility, growth — on their terms."
+          }
+        },
+        {
+          "type": "valor",
+          "settings": {
+            "numero": "03",
+            "categoria": "Materials",
+            "titulo": "Noble Humans · Honest Materials",
+            "descripcion": "Recycled Coco canvas, raw Palacio manta, and lightweight recycled cotton — chosen with purpose, not just aesthetics."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
