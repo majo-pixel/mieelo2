@@ -64,6 +64,7 @@
     {% endif %}
     {% if block_settings.color == 'custom' and block_settings.color_custom != blank %}
       --color: {{ block_settings.color_custom }};
+      color: {{ block_settings.color_custom }};
     {% endif %}
     {% if block_settings.background %}
       --text-background-color: {{ block_settings.background_color | default: 'rgb(255 255 255 / 1.0)' }};
