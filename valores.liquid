@@ -56,7 +56,7 @@
     {%- comment -%} Columna derecha {%- endcomment -%}
     <div class="valores__right">
       {%- for block in section.blocks -%}
-        <div class="valores__item" {{ block.shopify_attributes }}>
+        <div class="valores__item" style="border-top: {{ section.settings.linea_grosor }}px solid {{ section.settings.linea_color }};{% if forloop.last %} border-bottom: {{ section.settings.linea_grosor }}px solid {{ section.settings.linea_color }};{% endif %}" {{ block.shopify_attributes }}>
           <div class="valores__item-top">
             {%- if block.settings.numero != blank or block.settings.categoria != blank -%}
               <p class="valores__item-meta" style="
@@ -144,12 +144,7 @@
 
   .valores__item {
     padding-block: 1.75rem;
-    border-top: {{ section.settings.linea_grosor }}px solid {{ section.settings.linea_color }};
     opacity: 0.9;
-  }
-
-  .valores__item:last-child {
-    border-bottom: {{ section.settings.linea_grosor }}px solid {{ section.settings.linea_color }};
   }
 
   .valores__item-top {
