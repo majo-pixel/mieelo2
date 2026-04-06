@@ -1,6 +1,6 @@
 
 <footer class="footer-custom" style="background-color: {{ section.settings.fondo_color }};">
-  <div class="footer-custom__inner section section--page-width">
+  <div class="footer-custom__inner">
 
     {%- comment -%} Columna Logo {%- endcomment -%}
     <div class="footer-custom__col footer-custom__col--brand">
@@ -59,7 +59,7 @@
   <div class="footer-custom__divider" style="border-color: {{ section.settings.linea_color }};"></div>
 
   {%- comment -%} Barra inferior {%- endcomment -%}
-  <div class="footer-custom__bottom section section--page-width">
+  <div class="footer-custom__bottom">
     <p class="footer-custom__copy" style="color: {{ section.settings.copy_color }}; font-size: {{ section.settings.copy_tamano }};">{{ section.settings.copyright }}</p>
     {%- if section.settings.bottom_texto != blank -%}
       <p class="footer-custom__bottom-texto" style="color: {{ section.settings.copy_color }}; font-size: {{ section.settings.copy_tamano }};">
@@ -81,15 +81,19 @@
 
   .footer-custom__inner {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 2.5rem;
-    padding-bottom: 3rem;
+    padding: 3rem 2rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 
   @media screen and (min-width: 750px) {
     .footer-custom__inner {
-      grid-template-columns: 1.5fr repeat(3, 1fr);
-      gap: 2rem;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 3rem;
+      padding: 4rem 3rem 3rem;
     }
   }
 
@@ -162,8 +166,7 @@
     border: none;
     border-top: 1px solid;
     opacity: 0.2;
-    margin: 0 auto;
-    width: calc(100% - 4rem);
+    margin: 0 3rem;
   }
 
   .footer-custom__bottom {
@@ -171,8 +174,10 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding-top: 1.5rem;
-    padding-bottom: 2rem;
+    padding: 1.5rem 3rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 
   .footer-custom__copy,
