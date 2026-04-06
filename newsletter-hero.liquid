@@ -1,0 +1,397 @@
+
+<div class="nl-hero" style="min-height: {{ section.settings.altura }}px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+
+  {%- comment -%} Imagen de fondo {%- endcomment -%}
+  {%- if section.settings.imagen != blank -%}
+    <div class="nl-hero__bg">
+      {{
+        section.settings.imagen
+        | image_url: width: 2000
+        | image_tag:
+          class: 'nl-hero__bg-img',
+          widths: '750, 1100, 1500, 2000',
+          sizes: '100vw',
+          alt: section.settings.imagen.alt
+      }}
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Overlay oscuro {%- endcomment -%}
+  <div class="nl-hero__overlay" style="background-color: {{ section.settings.overlay_color }};"></div>
+
+  {%- comment -%} Contenido {%- endcomment -%}
+  <div class="nl-hero__content">
+    {%- if section.settings.etiqueta != blank -%}
+      <p class="nl-hero__etiqueta" style="color: {{ section.settings.etiqueta_color }}; font-size: {{ section.settings.etiqueta_tamano }}; font-family: {{ section.settings.etiqueta_fuente }}; letter-spacing: 0.12em;">{{ section.settings.etiqueta }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.titulo != blank -%}
+      <h2 class="nl-hero__titulo rte" style="color: {{ section.settings.titulo_color }}; font-size: {{ section.settings.titulo_tamano }}; font-family: {{ section.settings.titulo_fuente }}; font-weight: {{ section.settings.titulo_peso }};">{{ section.settings.titulo }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.descripcion != blank -%}
+      <p class="nl-hero__desc" style="color: {{ section.settings.desc_color }}; font-size: {{ section.settings.desc_tamano }};">{{ section.settings.descripcion }}</p>
+    {%- endif -%}
+
+    <form class="nl-hero__form" action="/contact#contact_form" method="post" accept-charset="UTF-8">
+      <input type="hidden" name="form_type" value="customer">
+      <input type="hidden" name="utf8" value="✓">
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <div class="nl-hero__input-wrap">
+        <input
+          type="email"
+          name="contact[email]"
+          class="nl-hero__input"
+          placeholder="{{ section.settings.placeholder }}"
+          required
+          style="
+            background-color: {{ section.settings.input_fondo }};
+            color: {{ section.settings.input_color }};
+            border-color: {{ section.settings.input_borde }};
+            font-size: {{ section.settings.input_tamano }};
+          "
+        >
+        <button
+          type="submit"
+          class="nl-hero__btn"
+          style="
+            background-color: {{ section.settings.btn_fondo }};
+            color: {{ section.settings.btn_color }};
+            font-size: {{ section.settings.btn_tamano }};
+          "
+        >
+          {{ section.settings.btn_texto }} →
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% stylesheet %}
+  .nl-hero {
+    width: 100%;
+  }
+
+  .nl-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .nl-hero__bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .nl-hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .nl-hero__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.25rem;
+    padding: 3rem 1.5rem;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  .nl-hero__etiqueta {
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .nl-hero__titulo {
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .nl-hero__titulo p { margin: 0; }
+
+  .nl-hero__desc {
+    margin: 0;
+    line-height: 1.7;
+    max-width: 520px;
+  }
+
+  .nl-hero__form {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .nl-hero__input-wrap {
+    display: flex;
+    gap: 0;
+    width: 100%;
+  }
+
+  .nl-hero__input {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    border: 1px solid;
+    outline: none;
+    min-width: 0;
+    font-size: inherit;
+  }
+
+  .nl-hero__btn {
+    padding: 0.85rem 1.5rem;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: inherit;
+    transition: opacity 0.2s;
+  }
+
+  .nl-hero__btn:hover {
+    opacity: 0.85;
+  }
+
+  @media screen and (max-width: 749px) {
+    .nl-hero__input-wrap {
+      flex-direction: column;
+    }
+    .nl-hero__btn {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter hero",
+  "tag": "section",
+  "class": "section-wrapper",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Imagen de fondo"
+    },
+    {
+      "type": "image_picker",
+      "id": "imagen",
+      "label": "Imagen"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Oscurecer imagen (overlay)",
+      "default": "#00000055",
+      "info": "Ajusta la transparencia para que el texto se lea bien"
+    },
+    {
+      "type": "range",
+      "id": "altura",
+      "label": "Altura mínima",
+      "min": 300,
+      "max": 900,
+      "step": 50,
+      "unit": "px",
+      "default": 550
+    },
+    {
+      "type": "header",
+      "content": "Etiqueta"
+    },
+    {
+      "type": "text",
+      "id": "etiqueta",
+      "label": "Texto",
+      "default": "STAY CLOSE"
+    },
+    {
+      "type": "color",
+      "id": "etiqueta_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Título"
+    },
+    {
+      "type": "richtext",
+      "id": "titulo",
+      "label": "Texto",
+      "default": "<p>Get the stories before the <em>products.</em></p>",
+      "info": "Usa cursiva y colores desde la barra de herramientas"
+    },
+    {
+      "type": "color",
+      "id": "titulo_color",
+      "label": "Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "titulo_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "2rem", "label": "32px" },
+        { "value": "2.5rem", "label": "40px" },
+        { "value": "3rem", "label": "48px" },
+        { "value": "clamp(2rem, 4vw, 3.5rem)", "label": "Fluido" }
+      ],
+      "default": "clamp(2rem, 4vw, 3.5rem)"
+    },
+    {
+      "type": "select",
+      "id": "titulo_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-heading--family)"
+    },
+    {
+      "type": "select",
+      "id": "titulo_peso",
+      "label": "Peso",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-negrita" },
+        { "value": "700", "label": "Negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Descripción"
+    },
+    {
+      "type": "textarea",
+      "id": "descripcion",
+      "label": "Texto",
+      "default": "New arrivals, maker updates, and behind-the-scenes from the workshop in Guatemala City."
+    },
+    {
+      "type": "color",
+      "id": "desc_color",
+      "label": "Color",
+      "default": "#dddddd"
+    },
+    {
+      "type": "select",
+      "id": "desc_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" },
+        { "value": "1.125rem", "label": "18px" }
+      ],
+      "default": "1rem"
+    },
+    {
+      "type": "header",
+      "content": "Campo de email"
+    },
+    {
+      "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "default": "your@email.com"
+    },
+    {
+      "type": "color",
+      "id": "input_fondo",
+      "label": "Fondo del input",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_color",
+      "label": "Color texto",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "input_borde",
+      "label": "Color borde",
+      "default": "#cccccc"
+    },
+    {
+      "type": "select",
+      "id": "input_tamano",
+      "label": "Tamaño texto",
+      "options": [
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" }
+      ],
+      "default": "0.875rem"
+    },
+    {
+      "type": "header",
+      "content": "Botón subscribe"
+    },
+    {
+      "type": "text",
+      "id": "btn_texto",
+      "label": "Texto",
+      "default": "SUBSCRIBE"
+    },
+    {
+      "type": "color",
+      "id": "btn_fondo",
+      "label": "Color de fondo",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Color texto",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "btn_tamano",
+      "label": "Tamaño texto",
+      "options": [
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" }
+      ],
+      "default": "0.75rem"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Newsletter hero"
+    }
+  ]
+}
+{% endschema %}
