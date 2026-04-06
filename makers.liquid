@@ -16,8 +16,8 @@
       {%- endif -%}
     </div>
     <div class="makers__header-right">
-      {%- if section.settings.boton_texto != blank and section.settings.boton_link != blank -%}
-        <a href="{{ section.settings.boton_link }}" class="makers__boton" {% if section.settings.boton_nueva_pestana %}target="_blank" rel="noopener"{% endif %} style="color:{{ section.settings.boton_color }};border-color:{{ section.settings.boton_borde }};">{{ section.settings.boton_texto }} →</a>
+      {%- if section.settings.boton_texto != blank -%}
+        <a href="{{ section.settings.boton_link | default: '#' }}" class="makers__boton" {% if section.settings.boton_nueva_pestana %}target="_blank" rel="noopener"{% endif %} style="color:{{ section.settings.boton_color }};border-color:{{ section.settings.boton_borde }};">{{ section.settings.boton_texto }} →</a>
       {%- endif -%}
       {%- if section.blocks.size > 0 -%}
         <div class="makers__nav">
@@ -32,7 +32,7 @@
   {%- if section.blocks.size > 0 -%}
     <div class="makers__carousel" id="makers-carousel-{{ section.id }}">
       {%- for block in section.blocks -%}
-        <div class="makers__card" style="background-color:{{ section.settings.card_fondo }};border-radius:{{ section.settings.card_radio }}px;" {{ block.shopify_attributes }}>
+        <div class="makers__card" style="background-color:{{ block.settings.card_fondo }};border-radius:{{ section.settings.card_radio }}px;" {{ block.shopify_attributes }}>
           <div class="makers__foto-wrapper">
             {%- if block.settings.foto != blank -%}
               {{ block.settings.foto | image_url: width: 600 | image_tag: class: 'makers__foto', widths: '300, 400, 600', sizes: '(min-width: 750px) 20vw, 50vw', alt: block.settings.nombre }}
@@ -280,6 +280,12 @@
           "label": "Foto"
         },
         {
+          "type": "color",
+          "id": "card_fondo",
+          "label": "Color de fondo de tarjeta",
+          "default": "#F5EFE9"
+        },
+        {
           "type": "text",
           "id": "nombre",
           "label": "Nombre",
@@ -488,8 +494,8 @@
     {
       "type": "color",
       "id": "card_fondo",
-      "label": "Color de fondo de tarjeta",
-      "default": "#00000000"
+      "label": "Color de fondo (todas las tarjetas)",
+      "default": "#F5EFE9"
     },
     {
       "type": "range",
