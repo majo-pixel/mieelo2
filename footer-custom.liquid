@@ -1,0 +1,520 @@
+
+<footer class="footer-custom" style="background-color: {{ section.settings.fondo_color }};">
+  <div class="footer-custom__inner section section--page-width">
+
+    {%- comment -%} Columna Logo {%- endcomment -%}
+    <div class="footer-custom__col footer-custom__col--brand">
+      {%- if section.settings.logo_texto != blank -%}
+        <a href="/" class="footer-custom__logo" style="font-family: {{ section.settings.logo_fuente }}; font-size: {{ section.settings.logo_tamano }};">
+          <span style="color: {{ section.settings.logo_color_1 }};">{{ section.settings.logo_parte_1 }}</span>
+          <em style="color: {{ section.settings.logo_color_2 }};">{{ section.settings.logo_parte_2 }}</em>
+        </a>
+      {%- endif -%}
+
+      {%- if section.settings.descripcion != blank -%}
+        <p class="footer-custom__desc" style="color: {{ section.settings.desc_color }}; font-size: {{ section.settings.desc_tamano }};">{{ section.settings.descripcion }}</p>
+      {%- endif -%}
+
+      <div class="footer-custom__socials">
+        {%- if section.settings.instagram_url != blank -%}
+          <a href="{{ section.settings.instagram_url }}" class="footer-custom__social" style="color: {{ section.settings.social_color }}; font-size: {{ section.settings.social_tamano }};" target="_blank" rel="noopener">INSTAGRAM</a>
+        {%- endif -%}
+        {%- if section.settings.facebook_url != blank -%}
+          <a href="{{ section.settings.facebook_url }}" class="footer-custom__social" style="color: {{ section.settings.social_color }}; font-size: {{ section.settings.social_tamano }};" target="_blank" rel="noopener">FACEBOOK</a>
+        {%- endif -%}
+        {%- if section.settings.youtube_url != blank -%}
+          <a href="{{ section.settings.youtube_url }}" class="footer-custom__social" style="color: {{ section.settings.social_color }}; font-size: {{ section.settings.social_tamano }};" target="_blank" rel="noopener">YOUTUBE</a>
+        {%- endif -%}
+        {%- if section.settings.tiktok_url != blank -%}
+          <a href="{{ section.settings.tiktok_url }}" class="footer-custom__social" style="color: {{ section.settings.social_color }}; font-size: {{ section.settings.social_tamano }};" target="_blank" rel="noopener">TIKTOK</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- comment -%} Columnas de links desde bloques {%- endcomment -%}
+    {%- for block in section.blocks -%}
+      <div class="footer-custom__col" {{ block.shopify_attributes }}>
+        {%- if block.settings.titulo_col != blank -%}
+          <p class="footer-custom__col-titulo" style="color: {{ block.settings.titulo_color }}; font-size: {{ block.settings.titulo_tamano }}; font-family: {{ block.settings.titulo_fuente }};">{{ block.settings.titulo_col }}</p>
+        {%- endif -%}
+        <ul class="footer-custom__links">
+          {%- for i in (1..6) -%}
+            {%- assign label_key = 'link_' | append: i | append: '_label' -%}
+            {%- assign url_key = 'link_' | append: i | append: '_url' -%}
+            {%- assign label = block.settings[label_key] -%}
+            {%- assign url = block.settings[url_key] -%}
+            {%- if label != blank -%}
+              <li>
+                <a href="{{ url | default: '#' }}" class="footer-custom__link" style="color: {{ block.settings.link_color }}; font-size: {{ block.settings.link_tamano }};">{{ label }}</a>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endfor -%}
+
+  </div>
+
+  {%- comment -%} Línea divisora {%- endcomment -%}
+  <div class="footer-custom__divider" style="border-color: {{ section.settings.linea_color }};"></div>
+
+  {%- comment -%} Barra inferior {%- endcomment -%}
+  <div class="footer-custom__bottom section section--page-width">
+    <p class="footer-custom__copy" style="color: {{ section.settings.copy_color }}; font-size: {{ section.settings.copy_tamano }};">{{ section.settings.copyright }}</p>
+    {%- if section.settings.bottom_texto != blank -%}
+      <p class="footer-custom__bottom-texto" style="color: {{ section.settings.copy_color }}; font-size: {{ section.settings.copy_tamano }};">
+        {{ section.settings.bottom_texto_pre }}
+        {%- if section.settings.bottom_link_url != blank -%}
+          <a href="{{ section.settings.bottom_link_url }}" style="color: {{ section.settings.bottom_link_color }};" target="_blank" rel="noopener">{{ section.settings.bottom_link_label }}</a>
+        {%- endif -%}
+        {{ section.settings.bottom_texto_post }}
+      </p>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% stylesheet %}
+  .footer-custom {
+    width: 100%;
+    padding-top: 4rem;
+  }
+
+  .footer-custom__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding-bottom: 3rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .footer-custom__inner {
+      grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  .footer-custom__col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .footer-custom__logo {
+    display: inline-flex;
+    gap: 0.3rem;
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  .footer-custom__logo em {
+    font-style: italic;
+  }
+
+  .footer-custom__desc {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .footer-custom__socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-custom__social {
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .footer-custom__social:hover {
+    opacity: 1;
+  }
+
+  .footer-custom__col-titulo {
+    margin: 0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .footer-custom__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .footer-custom__link {
+    text-decoration: none;
+    opacity: 0.75;
+    transition: opacity 0.2s;
+    line-height: 1.4;
+  }
+
+  .footer-custom__link:hover {
+    opacity: 1;
+  }
+
+  .footer-custom__divider {
+    border: none;
+    border-top: 1px solid;
+    opacity: 0.2;
+    margin: 0 auto;
+    width: calc(100% - 4rem);
+  }
+
+  .footer-custom__bottom {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .footer-custom__copy,
+  .footer-custom__bottom-texto {
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  .footer-custom__bottom-texto a {
+    opacity: 1;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Footer personalizado",
+  "tag": "section",
+  "class": "section-wrapper",
+  "max_blocks": 4,
+  "enabled_on": { "groups": ["footer"] },
+  "blocks": [
+    {
+      "type": "columna_links",
+      "name": "Columna de links",
+      "settings": [
+        {
+          "type": "text",
+          "id": "titulo_col",
+          "label": "Título de columna",
+          "default": "THE BRAND"
+        },
+        {
+          "type": "color",
+          "id": "titulo_color",
+          "label": "Color título",
+          "default": "#aaaaaa"
+        },
+        {
+          "type": "select",
+          "id": "titulo_tamano",
+          "label": "Tamaño título",
+          "options": [
+            { "value": "0.625rem", "label": "10px" },
+            { "value": "0.75rem", "label": "12px" },
+            { "value": "0.875rem", "label": "14px" }
+          ],
+          "default": "0.75rem"
+        },
+        {
+          "type": "select",
+          "id": "titulo_fuente",
+          "label": "Fuente título",
+          "options": [
+            { "value": "var(--font-body--family)", "label": "Cuerpo" },
+            { "value": "var(--font-heading--family)", "label": "Título" }
+          ],
+          "default": "var(--font-body--family)"
+        },
+        {
+          "type": "color",
+          "id": "link_color",
+          "label": "Color links",
+          "default": "#cccccc"
+        },
+        {
+          "type": "select",
+          "id": "link_tamano",
+          "label": "Tamaño links",
+          "options": [
+            { "value": "0.75rem", "label": "12px" },
+            { "value": "0.875rem", "label": "14px" },
+            { "value": "1rem", "label": "16px" }
+          ],
+          "default": "0.875rem"
+        },
+        { "type": "header", "content": "Link 1" },
+        { "type": "text", "id": "link_1_label", "label": "Texto", "default": "Our Story" },
+        { "type": "url", "id": "link_1_url", "label": "URL" },
+        { "type": "header", "content": "Link 2" },
+        { "type": "text", "id": "link_2_label", "label": "Texto", "default": "Our Makers" },
+        { "type": "url", "id": "link_2_url", "label": "URL" },
+        { "type": "header", "content": "Link 3" },
+        { "type": "text", "id": "link_3_label", "label": "Texto", "default": "The Process" },
+        { "type": "url", "id": "link_3_url", "label": "URL" },
+        { "type": "header", "content": "Link 4" },
+        { "type": "text", "id": "link_4_label", "label": "Texto" },
+        { "type": "url", "id": "link_4_url", "label": "URL" },
+        { "type": "header", "content": "Link 5" },
+        { "type": "text", "id": "link_5_label", "label": "Texto" },
+        { "type": "url", "id": "link_5_url", "label": "URL" },
+        { "type": "header", "content": "Link 6" },
+        { "type": "text", "id": "link_6_label", "label": "Texto" },
+        { "type": "url", "id": "link_6_url", "label": "URL" }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Fondo"
+    },
+    {
+      "type": "color",
+      "id": "fondo_color",
+      "label": "Color de fondo",
+      "default": "#1A1714"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "text",
+      "id": "logo_texto",
+      "label": "Activar logo texto",
+      "default": "mi eelo"
+    },
+    {
+      "type": "text",
+      "id": "logo_parte_1",
+      "label": "Primera parte",
+      "default": "mi"
+    },
+    {
+      "type": "text",
+      "id": "logo_parte_2",
+      "label": "Segunda parte (cursiva)",
+      "default": "eelo"
+    },
+    {
+      "type": "color",
+      "id": "logo_color_1",
+      "label": "Color primera parte",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "logo_color_2",
+      "label": "Color segunda parte",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "select",
+      "id": "logo_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-heading--family)"
+    },
+    {
+      "type": "select",
+      "id": "logo_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "1.25rem", "label": "20px" },
+        { "value": "1.5rem", "label": "24px" },
+        { "value": "1.75rem", "label": "28px" },
+        { "value": "2rem", "label": "32px" }
+      ],
+      "default": "1.5rem"
+    },
+    {
+      "type": "header",
+      "content": "Descripción"
+    },
+    {
+      "type": "textarea",
+      "id": "descripcion",
+      "label": "Texto",
+      "default": "Made in Guatemala with ganas.\nPart of the Creamos income-generation program."
+    },
+    {
+      "type": "color",
+      "id": "desc_color",
+      "label": "Color",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "select",
+      "id": "desc_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" }
+      ],
+      "default": "0.875rem"
+    },
+    {
+      "type": "header",
+      "content": "Redes sociales"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "color",
+      "id": "social_color",
+      "label": "Color redes",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "select",
+      "id": "social_tamano",
+      "label": "Tamaño redes",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    },
+    {
+      "type": "header",
+      "content": "Línea divisora"
+    },
+    {
+      "type": "color",
+      "id": "linea_color",
+      "label": "Color de línea",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Barra inferior"
+    },
+    {
+      "type": "text",
+      "id": "copyright",
+      "label": "Copyright",
+      "default": "© 2026 mi eelo · All rights reserved"
+    },
+    {
+      "type": "text",
+      "id": "bottom_texto_pre",
+      "label": "Texto antes del link",
+      "default": "Part of the"
+    },
+    {
+      "type": "text",
+      "id": "bottom_link_label",
+      "label": "Texto del link",
+      "default": "Creamos Guatemala"
+    },
+    {
+      "type": "url",
+      "id": "bottom_link_url",
+      "label": "URL del link"
+    },
+    {
+      "type": "text",
+      "id": "bottom_texto_post",
+      "label": "Texto después del link",
+      "default": "income-generation program"
+    },
+    {
+      "type": "text",
+      "id": "bottom_texto",
+      "label": "Activar barra inferior",
+      "default": "si",
+      "info": "Escribe algo aquí para mostrar la barra inferior"
+    },
+    {
+      "type": "color",
+      "id": "bottom_link_color",
+      "label": "Color del link",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "color",
+      "id": "copy_color",
+      "label": "Color texto inferior",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "select",
+      "id": "copy_tamano",
+      "label": "Tamaño texto inferior",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer personalizado",
+      "blocks": [
+        {
+          "type": "columna_links",
+          "settings": {
+            "titulo_col": "THE BRAND",
+            "link_1_label": "Our Story",
+            "link_2_label": "Our Makers",
+            "link_3_label": "The Process",
+            "link_4_label": "Impact"
+          }
+        },
+        {
+          "type": "columna_links",
+          "settings": {
+            "titulo_col": "COLLECTIONS",
+            "link_1_label": "Lunar Collection",
+            "link_2_label": "Classics Collection",
+            "link_3_label": "Women's Day",
+            "link_4_label": "Create With Us"
+          }
+        },
+        {
+          "type": "columna_links",
+          "settings": {
+            "titulo_col": "CONTACT",
+            "link_1_label": "hola@mi-eelo.com",
+            "link_2_label": "@mi.eelo",
+            "link_3_label": "Guatemala City, GT",
+            "link_4_label": "Wholesale: 50+ units"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
