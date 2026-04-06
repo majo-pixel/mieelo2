@@ -17,19 +17,12 @@
       {%- endif -%}
 
       {%- if section.settings.titulo != blank -%}
-        <h2 class="makers__titulo" style="
+        <h2 class="makers__titulo rte" style="
           color: {{ section.settings.titulo_color }};
           font-size: {{ section.settings.titulo_tamano }};
           font-family: {{ section.settings.titulo_fuente }};
           font-weight: {{ section.settings.titulo_peso }};
-        ">
-          {%- assign partes = section.settings.titulo | split: section.settings.palabra_destacada -%}
-          {%- if section.settings.palabra_destacada != blank and partes.size > 1 -%}
-            {{ partes[0] }}<em style="color: {{ section.settings.color_destacado }}; font-style: italic;">{{ section.settings.palabra_destacada }}</em>{{ partes[1] }}
-          {%- else -%}
-            {{ section.settings.titulo }}
-          {%- endif -%}
-        </h2>
+        ">{{ section.settings.titulo }}</h2>
       {%- endif -%}
     </div>
 
@@ -359,22 +352,11 @@
       "default": "var(--font-body--family)"
     },
     {
-      "type": "textarea",
+      "type": "richtext",
       "id": "titulo",
       "label": "Título",
-      "default": "The names behind the stitches."
-    },
-    {
-      "type": "text",
-      "id": "palabra_destacada",
-      "label": "Palabra con color destacado",
-      "default": "stitches."
-    },
-    {
-      "type": "color",
-      "id": "color_destacado",
-      "label": "Color destacado",
-      "default": "#C97B5A"
+      "default": "<p>The names behind the <em>stitches.</em></p>",
+      "info": "Puedes usar negrilla, cursiva, y otros formatos desde la barra de herramientas"
     },
     {
       "type": "color",
