@@ -15,6 +15,40 @@
         <p class="footer-custom__desc" style="color: {{ section.settings.desc_color }}; font-size: {{ section.settings.desc_tamano }};">{{ section.settings.descripcion }}</p>
       {%- endif -%}
 
+      {%- comment -%} Selector de país e idioma {%- endcomment -%}
+      {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
+        <div class="footer-custom__localization">
+          {%- if localization.available_countries.size > 1 -%}
+            {%- form 'localization' -%}
+              <div class="footer-custom__locale-wrap">
+                <label class="footer-custom__locale-label" style="color: {{ section.settings.social_color }};">🌐</label>
+                <select name="country_code" onchange="this.form.submit()" class="footer-custom__locale-select" style="color: {{ section.settings.social_color }}; background: transparent; border: 1px solid {{ section.settings.social_color }}; padding: 0.3rem 0.5rem; font-size: {{ section.settings.social_tamano }};">
+                  {%- for country in localization.available_countries -%}
+                    <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+                      {{ country.name }} ({{ country.currency.iso_code }})
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </div>
+            {%- endform -%}
+          {%- endif -%}
+
+          {%- if localization.available_languages.size > 1 -%}
+            {%- form 'localization' -%}
+              <div class="footer-custom__locale-wrap">
+                <select name="locale_code" onchange="this.form.submit()" class="footer-custom__locale-select" style="color: {{ section.settings.social_color }}; background: transparent; border: 1px solid {{ section.settings.social_color }}; padding: 0.3rem 0.5rem; font-size: {{ section.settings.social_tamano }};">
+                  {%- for language in localization.available_languages -%}
+                    <option value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
+                      {{ language.endonym_name }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </div>
+            {%- endform -%}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
       <div class="footer-custom__socials">
         {%- if section.settings.instagram_url != blank -%}
           <a href="{{ section.settings.instagram_url }}" class="footer-custom__social" style="color: {{ section.settings.social_color }}; font-size: {{ section.settings.social_tamano }};" target="_blank" rel="noopener">INSTAGRAM</a>
@@ -178,6 +212,35 @@
     max-width: 1200px;
     margin: 0 auto;
     box-sizing: border-box;
+  }
+
+  .footer-custom__localization {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .footer-custom__locale-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .footer-custom__locale-select {
+    cursor: pointer;
+    border-radius: 4px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    width: 100%;
+  }
+
+  .footer-custom__locale-select:hover {
+    opacity: 1;
+  }
+
+  .footer-custom__locale-select option {
+    background: #1a1714;
+    color: #ffffff;
   }
 
   .footer-custom__copy,
