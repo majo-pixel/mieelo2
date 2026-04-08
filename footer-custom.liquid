@@ -18,35 +18,53 @@
       {%- comment -%} Selector de país e idioma {%- endcomment -%}
       {%- if localization.available_countries.size > 1 or localization.available_languages.size > 1 -%}
         <div class="footer-custom__localization">
-          {%- if localization.available_countries.size > 1 -%}
-            {%- form 'localization' -%}
-              <div class="footer-custom__locale-wrap">
-                <label class="footer-custom__locale-label" style="color: {{ section.settings.social_color }};">🌐</label>
-                <select name="country_code" onchange="this.form.submit()" class="footer-custom__locale-select" style="color: {{ section.settings.social_color }}; background: transparent; border: 1px solid {{ section.settings.social_color }}; padding: 0.3rem 0.5rem; font-size: {{ section.settings.social_tamano }};">
-                  {%- for country in localization.available_countries -%}
-                    <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
-                      {{ country.name }} ({{ country.currency.iso_code }})
-                    </option>
-                  {%- endfor -%}
-                </select>
-              </div>
-            {%- endform -%}
-          {%- endif -%}
-
-          {%- if localization.available_languages.size > 1 -%}
-            {%- form 'localization' -%}
-              <div class="footer-custom__locale-wrap">
-                <select name="locale_code" onchange="this.form.submit()" class="footer-custom__locale-select" style="color: {{ section.settings.social_color }}; background: transparent; border: 1px solid {{ section.settings.social_color }}; padding: 0.3rem 0.5rem; font-size: {{ section.settings.social_tamano }};">
-                  {%- for language in localization.available_languages -%}
-                    <option value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
-                      {{ language.endonym_name }}
-                    </option>
-                  {%- endfor -%}
-                </select>
-              </div>
-            {%- endform -%}
-          {%- endif -%}
+          {%- form 'localization', id: 'localization-form-footer' -%}
+            <input type="hidden" name="locale_code" id="footer-locale-input" value="{{ localization.language.iso_code }}">
+            <div class="footer-custom__locale-wrap">
+              <span style="color: {{ section.settings.social_color }}; font-size: {{ section.settings.social_tamano }};">🌐</span>
+              <select
+                name="country_code"
+                id="footer-country-select"
+                class="footer-custom__locale-select"
+                style="color: {{ section.settings.social_color }}; background: transparent; border: 1px solid {{ section.settings.social_color }}; padding: 0.3rem 0.5rem; font-size: {{ section.settings.social_tamano }};"
+              >
+                {%- for country in localization.available_countries -%}
+                  <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+                    {{ country.name }} ({{ country.currency.iso_code }})
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endform -%}
         </div>
+
+        <script>
+          (function() {
+            var countrySelect = document.getElementById('footer-country-select');
+            var localeInput = document.getElementById('footer-locale-input');
+            var form = document.getElementById('localization-form-footer');
+
+            // Mapa país → idioma
+            var countryLangMap = {
+              'GT': 'es', 'MX': 'es', 'ES': 'es', 'AR': 'es',
+              'CO': 'es', 'PE': 'es', 'CL': 'es', 'EC': 'es',
+              'VE': 'es', 'BO': 'es', 'PY': 'es', 'UY': 'es',
+              'SV': 'es', 'HN': 'es', 'NI': 'es', 'CR': 'es',
+              'PA': 'es', 'DO': 'es', 'CU': 'es', 'PR': 'es',
+              'US': 'en', 'CA': 'en', 'GB': 'en', 'AU': 'en',
+              'NZ': 'en', 'IE': 'en'
+            };
+
+            if (countrySelect && localeInput && form) {
+              countrySelect.addEventListener('change', function() {
+                var selectedCountry = this.value;
+                var lang = countryLangMap[selectedCountry] || 'en';
+                localeInput.value = lang;
+                form.submit();
+              });
+            }
+          })();
+        </script>
       {%- endif -%}
 
       <div class="footer-custom__socials">
