@@ -1,0 +1,19 @@
+{
+  "name": "mieelo-generador-imagenes",
+  "version": "1.0.0",
+  "description": "Generador de imágenes para mi eelo usando fal.ai / nano-banana-2",
+  "type": "module",
+  "scripts": {
+    "start": "node generar-imagen.js",
+    "artesana": "node generar-imagen.js --guia artesana",
+    "bolsa": "node generar-imagen.js --guia bolsa",
+    "proceso": "node generar-imagen.js --guia proceso",
+    "coleccion": "node generar-imagen.js --guia coleccion",
+    "textura": "node generar-imagen.js --guia textura",
+    "impacto": "node generar-imagen.js --guia impacto"
+  },
+  "dependencies": {
+    "@fal-ai/serverless-client": "^0.15.0",
+    "dotenv": "^16.0.0"
+  }
+}
