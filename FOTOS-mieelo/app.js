@@ -2,6 +2,10 @@
  * INTERFAZ WEB — Generador de imágenes mi eelo
  * Ejecutar: node app.js
  * Abrir en navegador: http://localhost:3000
+ *
+ * MODOS:
+ *  - Texto → imagen (nano-banana-2): genera desde cero con guías de estilo
+ *  - Mi foto → nueva imagen (flux img2img): usa tu foto como base y la transforma
  */
 
 import http from "http";
@@ -30,6 +34,8 @@ const GUIAS = {
   impacto: { nombre: "Comunidad / Impacto", prompt: "group of Guatemalan women artisans smiling together in a workshop, community feeling, bags and tools visible, authentic documentary, warm group portrait, natural light, joy, empowerment", negativo: "staged, stock photo, corporate, artificial" }
 };
 
+// ─── HTML ─────────────────────────────────────────────────────────────────────
+
 const HTML = `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -39,150 +45,323 @@ const HTML = `<!DOCTYPE html>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Georgia, serif; background: #1a1714; color: #f0ebe5; min-height: 100vh; padding: 2rem 1rem; }
-  .container { max-width: 900px; margin: 0 auto; }
+  .container { max-width: 960px; margin: 0 auto; }
   h1 { font-size: 1.8rem; font-weight: 400; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
   h1 em { color: #C97B5A; font-style: italic; }
-  .subtitle { color: #999; font-size: 0.9rem; margin-bottom: 2.5rem; letter-spacing: 0.08em; }
-  .key-warning { background: #3a2a1a; border: 1px solid #C97B5A; border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 2rem; color: #e8c4a8; font-size: 0.875rem; line-height: 1.6; }
-  .key-warning a { color: #C97B5A; }
-  .panel { background: #252220; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
-  .panel h2 { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #999; margin-bottom: 1.2rem; }
-  .guias { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; margin-bottom: 1.2rem; }
-  .guia-btn { padding: 0.7rem 1rem; background: #1a1714; border: 1px solid #3a3632; border-radius: 6px; color: #ccc; cursor: pointer; text-align: left; font-family: inherit; font-size: 0.875rem; transition: all 0.2s; }
+  .subtitle { color: #999; font-size: 0.85rem; margin-bottom: 2rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* Tabs modo */
+  .modos { display: flex; gap: 0; margin-bottom: 1.5rem; border: 1px solid #3a3632; border-radius: 6px; overflow: hidden; }
+  .modo-btn { flex: 1; padding: 0.85rem; background: #252220; border: none; color: #aaa; cursor: pointer; font-family: inherit; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
+  .modo-btn.activo { background: #C97B5A; color: white; }
+  .modo-btn:not(:last-child) { border-right: 1px solid #3a3632; }
+
+  .panel { background: #252220; border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
+  .panel h2 { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #777; margin-bottom: 1.2rem; }
+
+  /* Key */
+  .key-bar { display: flex; gap: 0.5rem; align-items: center; background: #252220; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; }
+  .key-bar label { font-size: 0.75rem; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; white-space: nowrap; }
+  .key-bar input { flex: 1; background: #1a1714; border: 1px solid #3a3632; border-radius: 4px; color: #f0ebe5; padding: 0.5rem 0.75rem; font-family: inherit; font-size: 0.85rem; }
+  .key-bar input:focus { outline: none; border-color: #C97B5A; }
+  .btn-sm { padding: 0.5rem 1rem; background: #3a3632; border: 1px solid #555; border-radius: 4px; color: #ccc; cursor: pointer; white-space: nowrap; font-family: inherit; font-size: 0.8rem; }
+  .btn-sm:hover { border-color: #C97B5A; color: #C97B5A; }
+  .key-ok { color: #7ab87a; font-size: 0.8rem; }
+
+  /* Guías */
+  .guias { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.6rem; margin-bottom: 1.2rem; }
+  .guia-btn { padding: 0.65rem 1rem; background: #1a1714; border: 1px solid #3a3632; border-radius: 6px; color: #ccc; cursor: pointer; text-align: left; font-family: inherit; font-size: 0.85rem; transition: all 0.2s; }
   .guia-btn:hover, .guia-btn.activo { border-color: #C97B5A; color: #C97B5A; background: #2a1f15; }
-  .guia-btn .icon { display: block; font-size: 1.2rem; margin-bottom: 0.3rem; }
-  label { display: block; font-size: 0.8rem; letter-spacing: 0.08em; color: #aaa; margin-bottom: 0.5rem; text-transform: uppercase; }
-  textarea, input[type=text], input[type=password], select { width: 100%; background: #1a1714; border: 1px solid #3a3632; border-radius: 4px; color: #f0ebe5; padding: 0.75rem; font-family: inherit; font-size: 0.9rem; margin-bottom: 1rem; }
-  textarea:focus, input:focus, select:focus { outline: none; border-color: #C97B5A; }
-  textarea { resize: vertical; min-height: 80px; }
+  .guia-btn .icon { font-size: 1.1rem; margin-right: 0.4rem; }
+
+  label { display: block; font-size: 0.75rem; letter-spacing: 0.08em; color: #aaa; margin-bottom: 0.4rem; text-transform: uppercase; }
+  textarea, input[type=text], select { width: 100%; background: #1a1714; border: 1px solid #3a3632; border-radius: 4px; color: #f0ebe5; padding: 0.7rem; font-family: inherit; font-size: 0.9rem; margin-bottom: 1rem; }
+  textarea:focus, input[type=text]:focus, select:focus { outline: none; border-color: #C97B5A; }
+  textarea { resize: vertical; min-height: 70px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .btn-generar { width: 100%; padding: 1rem; background: #C97B5A; color: white; border: none; border-radius: 6px; font-family: inherit; font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+
+  /* Upload zona */
+  .upload-zona { border: 2px dashed #3a3632; border-radius: 8px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 1rem; background: #1a1714; }
+  .upload-zona:hover, .upload-zona.drag-over { border-color: #C97B5A; background: #2a1f15; }
+  .upload-zona p { color: #777; font-size: 0.875rem; margin-top: 0.5rem; }
+  .upload-zona .icono { font-size: 2.5rem; }
+  .preview-wrap { position: relative; display: inline-block; margin-top: 1rem; }
+  .preview-wrap img { max-width: 100%; max-height: 220px; border-radius: 6px; display: block; }
+  .preview-wrap .btn-quitar { position: absolute; top: 0.4rem; right: 0.4rem; background: rgba(0,0,0,0.7); border: none; color: white; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+  #foto-input { display: none; }
+
+  /* Fuerza slider */
+  .slider-wrap { margin-bottom: 1rem; }
+  .slider-wrap input[type=range] { width: 100%; accent-color: #C97B5A; }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #777; margin-top: 0.25rem; }
+  .slider-val { color: #C97B5A; font-size: 0.85rem; font-weight: bold; }
+
+  /* Tips */
+  .tip { background: #1e2a1e; border-left: 3px solid #7ab87a; border-radius: 0 6px 6px 0; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.8rem; color: #a8d4a8; line-height: 1.6; }
+  .tip strong { color: #7ab87a; }
+
+  /* Botón generar */
+  .btn-generar { width: 100%; padding: 1rem; background: #C97B5A; color: white; border: none; border-radius: 6px; font-family: inherit; font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-bottom: 1rem; }
   .btn-generar:hover { opacity: 0.85; }
-  .btn-generar:disabled { opacity: 0.5; cursor: not-allowed; }
-  .estado { text-align: center; padding: 1rem; color: #C97B5A; font-size: 0.9rem; display: none; }
-  .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-  .galeria img { width: 100%; border-radius: 6px; display: block; }
-  .img-wrap { position: relative; }
-  .img-wrap a { display: block; }
-  .img-wrap .descargar { position: absolute; bottom: 0.5rem; right: 0.5rem; background: rgba(0,0,0,0.7); color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em; }
-  .error { background: #3a1a1a; border: 1px solid #c97b5a80; border-radius: 6px; padding: 1rem; color: #e8a8a8; margin-top: 1rem; font-size: 0.875rem; display: none; }
-  .key-input-wrap { display: flex; gap: 0.5rem; }
-  .key-input-wrap input { margin: 0; flex: 1; }
-  .btn-save-key { padding: 0.75rem 1rem; background: #3a3632; border: 1px solid #555; border-radius: 4px; color: #ccc; cursor: pointer; white-space: nowrap; font-family: inherit; font-size: 0.85rem; }
-  .btn-save-key:hover { border-color: #C97B5A; color: #C97B5A; }
+  .btn-generar:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .estado { text-align: center; padding: 1rem; color: #C97B5A; font-size: 0.9rem; display: none; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .error { background: #3a1a1a; border: 1px solid #c97b5a80; border-radius: 6px; padding: 1rem; color: #e8a8a8; margin-bottom: 1rem; font-size: 0.875rem; display: none; }
+
+  /* Galería */
+  .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+  .img-wrap { position: relative; border-radius: 8px; overflow: hidden; background: #252220; }
+  .img-wrap img { width: 100%; display: block; }
+  .img-acciones { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 1.5rem 0.75rem 0.75rem; display: flex; gap: 0.5rem; justify-content: flex-end; }
+  .img-acciones a { background: rgba(255,255,255,0.15); color: white; padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.75rem; text-decoration: none; backdrop-filter: blur(4px); }
+  .img-acciones a:hover { background: rgba(201,123,90,0.8); }
+  .img-label { padding: 0.5rem 0.75rem; font-size: 0.7rem; color: #777; letter-spacing: 0.05em; }
+
+  .seccion-oculta { display: none; }
 </style>
 </head>
 <body>
 <div class="container">
+
   <h1>mi <em>eelo</em></h1>
-  <p class="subtitle">GENERADOR DE IMÁGENES · fal.ai / nano-banana-2</p>
+  <p class="subtitle">Generador de imágenes · fal.ai</p>
 
-  <div id="key-warning" class="key-warning" style="display:none">
-    ⚠️ Falta tu clave de fal.ai. Obtén una gratis en <a href="https://fal.ai/dashboard/keys" target="_blank">fal.ai/dashboard/keys</a> e ingrésala abajo.
+  <!-- Clave API -->
+  <div class="key-bar">
+    <label>FAL_KEY</label>
+    <input type="password" id="fal-key" placeholder="fal_sk_..." oninput="verificarKey()">
+    <button class="btn-sm" onclick="guardarKey()">Guardar</button>
+    <span class="key-ok" id="key-ok" style="display:none">✓ Lista</span>
   </div>
 
-  <div class="panel">
-    <h2>Clave API fal.ai</h2>
-    <label>FAL_KEY (se guarda solo en esta sesión)</label>
-    <div class="key-input-wrap">
-      <input type="password" id="fal-key" placeholder="fal_sk_..." />
-      <button class="btn-save-key" onclick="guardarKey()">Guardar</button>
-    </div>
+  <!-- Selector de modo -->
+  <div class="modos">
+    <button class="modo-btn activo" id="tab-crear" onclick="cambiarModo('crear')">
+      ✨ Crear desde cero
+    </button>
+    <button class="modo-btn" id="tab-foto" onclick="cambiarModo('foto')">
+      📷 Usar mis fotos
+    </button>
   </div>
 
-  <div class="panel">
-    <h2>Guía de estilo mi eelo</h2>
-    <div class="guias">
-      <button class="guia-btn" onclick="elegirGuia('artesana', this)"><span class="icon">👐</span>Artesana en taller</button>
-      <button class="guia-btn" onclick="elegirGuia('bolsa', this)"><span class="icon">👜</span>Producto — Bolsa</button>
-      <button class="guia-btn" onclick="elegirGuia('proceso', this)"><span class="icon">✂️</span>Proceso de creación</button>
-      <button class="guia-btn" onclick="elegirGuia('coleccion', this)"><span class="icon">📸</span>Campaña colección</button>
-      <button class="guia-btn" onclick="elegirGuia('textura', this)"><span class="icon">🟫</span>Textura de cuero</button>
-      <button class="guia-btn" onclick="elegirGuia('impacto', this)"><span class="icon">🤝</span>Comunidad / Impacto</button>
-    </div>
-    <label>O escribe tu descripción personalizada</label>
-    <textarea id="prompt-custom" placeholder="Ej: mujer guatemalteca con bolsa artesanal en mercado colonial, luz de tarde, colores tierra..."></textarea>
-    <label>Negativo (qué evitar)</label>
-    <textarea id="prompt-negativo" placeholder="Ej: fondo blanco, artificial, stock photo..." rows="2"></textarea>
-  </div>
-
-  <div class="panel">
-    <h2>Opciones</h2>
-    <div class="row">
-      <div>
-        <label>Formato</label>
-        <select id="formato">
-          <option value="1024x1024">Cuadrado 1024×1024</option>
-          <option value="768x1024">Vertical 768×1024 (Stories)</option>
-          <option value="1024x768">Horizontal 1024×768</option>
-          <option value="512x512">Pequeño 512×512</option>
-        </select>
+  <!-- MODO 1: Crear desde cero -->
+  <div id="modo-crear">
+    <div class="panel">
+      <h2>Guía de estilo mi eelo</h2>
+      <div class="guias">
+        <button class="guia-btn" onclick="elegirGuia('artesana', this)"><span class="icon">👐</span>Artesana en taller</button>
+        <button class="guia-btn" onclick="elegirGuia('bolsa', this)"><span class="icon">👜</span>Producto — Bolsa</button>
+        <button class="guia-btn" onclick="elegirGuia('proceso', this)"><span class="icon">✂️</span>Proceso de creación</button>
+        <button class="guia-btn" onclick="elegirGuia('coleccion', this)"><span class="icon">📸</span>Campaña colección</button>
+        <button class="guia-btn" onclick="elegirGuia('textura', this)"><span class="icon">🟫</span>Textura de cuero</button>
+        <button class="guia-btn" onclick="elegirGuia('impacto', this)"><span class="icon">🤝</span>Comunidad / Impacto</button>
       </div>
-      <div>
-        <label>Cantidad de imágenes</label>
-        <select id="cantidad">
-          <option value="1">1 imagen</option>
-          <option value="2">2 imágenes</option>
-          <option value="4">4 imágenes</option>
-        </select>
+      <label>O escribe lo que quieres ver</label>
+      <textarea id="prompt-custom" placeholder="Ej: bolsa de cuero marrón sobre mesa de madera, luz de tarde, fondo neutro..."></textarea>
+      <label>Qué evitar (negativo)</label>
+      <textarea id="prompt-negativo" rows="2" placeholder="Ej: fondo blanco, artificial, plástico..."></textarea>
+    </div>
+    <div class="panel">
+      <h2>Opciones</h2>
+      <div class="row">
+        <div>
+          <label>Formato</label>
+          <select id="formato-crear">
+            <option value="1024x1024">Cuadrado 1:1</option>
+            <option value="768x1024">Vertical 3:4 (Stories)</option>
+            <option value="1024x768">Horizontal 4:3</option>
+          </select>
+        </div>
+        <div>
+          <label>Cantidad</label>
+          <select id="cantidad-crear">
+            <option value="1">1 imagen</option>
+            <option value="2">2 imágenes</option>
+            <option value="4">4 imágenes</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- MODO 2: Usar mis fotos -->
+  <div id="modo-foto" class="seccion-oculta">
+
+    <div class="tip">
+      <strong>¿Cómo funciona?</strong><br>
+      Subes tu foto (de una bolsa, artesana, taller...) y le dices al AI cómo transformarla.
+      Puedes mejorar el fondo, cambiar el estilo, agregar iluminación profesional, o crear una versión editorial de tu foto original.
+    </div>
+
+    <div class="panel">
+      <h2>Tu foto de referencia</h2>
+      <div class="upload-zona" id="upload-zona" onclick="document.getElementById('foto-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFoto(event)">
+        <div id="upload-placeholder">
+          <div class="icono">📂</div>
+          <strong>Haz clic o arrastra tu foto aquí</strong>
+          <p>JPG, PNG, WEBP · Máximo 10MB</p>
+        </div>
+        <div id="preview-wrap" class="preview-wrap" style="display:none">
+          <img id="foto-preview" src="" alt="Vista previa">
+          <button class="btn-quitar" onclick="quitarFoto(event)">✕ Quitar</button>
+        </div>
+      </div>
+      <input type="file" id="foto-input" accept="image/*" onchange="subirFoto(this)">
+    </div>
+
+    <div class="panel">
+      <h2>Qué hacer con la foto</h2>
+
+      <label>¿Qué tipo de transformación quieres?</label>
+      <div class="guias" style="margin-bottom:1.2rem">
+        <button class="guia-btn" onclick="elegirTransf('mejorar', this)"><span class="icon">✨</span>Mejorar calidad</button>
+        <button class="guia-btn" onclick="elegirTransf('fondo', this)"><span class="icon">🖼️</span>Cambiar fondo</button>
+        <button class="guia-btn" onclick="elegirTransf('editorial', this)"><span class="icon">📰</span>Estilo editorial</button>
+        <button class="guia-btn" onclick="elegirTransf('producto', this)"><span class="icon">🛍️</span>Foto de producto</button>
+        <button class="guia-btn" onclick="elegirTransf('artesanal', this)"><span class="icon">🏺</span>Estilo artesanal</button>
+        <button class="guia-btn" onclick="elegirTransf('custom', this)"><span class="icon">✏️</span>Personalizado</button>
+      </div>
+
+      <label>Descripción del resultado que quieres</label>
+      <textarea id="prompt-foto" placeholder="Ej: misma bolsa pero con fondo de tela de lino natural, luz suave desde la izquierda, estilo editorial..."></textarea>
+
+      <div class="slider-wrap">
+        <label>Fuerza de transformación — <span class="slider-val" id="fuerza-val">70%</span></label>
+        <input type="range" id="fuerza" min="20" max="95" value="70" oninput="document.getElementById('fuerza-val').textContent=this.value+'%'">
+        <div class="slider-labels">
+          <span>Conserva más tu foto</span>
+          <span>Transforma más</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Formato de salida</label>
+          <select id="formato-foto">
+            <option value="1024x1024">Cuadrado 1:1</option>
+            <option value="768x1024">Vertical (Stories)</option>
+            <option value="1024x768">Horizontal</option>
+          </select>
+        </div>
+        <div>
+          <label>Cantidad</label>
+          <select id="cantidad-foto">
+            <option value="1">1 imagen</option>
+            <option value="2">2 imágenes</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón y estado -->
   <button class="btn-generar" id="btn-generar" onclick="generar()">Generar imágenes →</button>
-  <div class="estado" id="estado">⏳ Generando... puede tardar 15-30 segundos</div>
+  <div class="estado" id="estado">⏳ Generando… puede tardar 20-40 segundos</div>
   <div class="error" id="error"></div>
+
+  <!-- Galería de resultados -->
   <div class="galeria" id="galeria"></div>
+
 </div>
 
 <script>
-  let guiaActual = null;
   const GUIAS = ${JSON.stringify(GUIAS)};
+  const TRANSFORMACIONES = {
+    mejorar: "same composition, professional photography, improved lighting, sharp focus, high quality, editorial style, mi eelo brand aesthetic, warm earthy tones",
+    fondo: "same subject, natural linen or wood surface background, minimal clean background, soft studio lighting, product photography, mi eelo brand",
+    editorial: "editorial fashion photography style, warm afternoon light, film photography aesthetic, muted warm palette, authentic, mi eelo brand Guatemala",
+    producto: "professional product photography, clean neutral background, soft shadows, high detail, commercial quality, handcrafted aesthetic",
+    artesanal: "artisan workshop setting, natural textures, warm wood and leather tones, handmade quality visible, documentary style, Guatemala"
+  };
 
-  // Carga key guardada en sessionStorage
-  window.onload = function() {
+  let modoActual = 'crear';
+  let guiaActual = null;
+  let transfActual = null;
+  let fotoBase64 = null;
+
+  window.onload = () => {
     const k = sessionStorage.getItem('fal_key');
-    if (k) document.getElementById('fal-key').value = k;
-    verificarKey();
+    if (k) { document.getElementById('fal-key').value = k; verificarKey(); }
   };
 
   function verificarKey() {
     const k = document.getElementById('fal-key').value.trim() || sessionStorage.getItem('fal_key') || '';
-    document.getElementById('key-warning').style.display = k ? 'none' : 'block';
+    document.getElementById('key-ok').style.display = k ? 'inline' : 'none';
   }
 
   function guardarKey() {
     const k = document.getElementById('fal-key').value.trim();
-    if (k) { sessionStorage.setItem('fal_key', k); verificarKey(); alert('✅ Clave guardada para esta sesión'); }
+    if (k) { sessionStorage.setItem('fal_key', k); verificarKey(); }
+  }
+
+  function cambiarModo(modo) {
+    modoActual = modo;
+    document.getElementById('modo-crear').classList.toggle('seccion-oculta', modo !== 'crear');
+    document.getElementById('modo-foto').classList.toggle('seccion-oculta', modo !== 'foto');
+    document.getElementById('tab-crear').classList.toggle('activo', modo === 'crear');
+    document.getElementById('tab-foto').classList.toggle('activo', modo === 'foto');
   }
 
   function elegirGuia(id, btn) {
     guiaActual = id;
-    document.querySelectorAll('.guia-btn').forEach(b => b.classList.remove('activo'));
+    document.querySelectorAll('#modo-crear .guia-btn').forEach(b => b.classList.remove('activo'));
     btn.classList.add('activo');
     document.getElementById('prompt-custom').value = '';
     document.getElementById('prompt-negativo').value = GUIAS[id].negativo;
   }
 
+  function elegirTransf(id, btn) {
+    transfActual = id;
+    document.querySelectorAll('#modo-foto .guia-btn').forEach(b => b.classList.remove('activo'));
+    btn.classList.add('activo');
+    if (id !== 'custom' && TRANSFORMACIONES[id]) {
+      document.getElementById('prompt-foto').value = '';
+      document.getElementById('prompt-foto').placeholder = TRANSFORMACIONES[id].substring(0,80) + '...';
+    } else {
+      document.getElementById('prompt-foto').placeholder = 'Describe el resultado que quieres...';
+    }
+  }
+
+  // Upload foto
+  function subirFoto(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { alert('La foto es muy grande. Máximo 10MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      fotoBase64 = e.target.result;
+      document.getElementById('foto-preview').src = fotoBase64;
+      document.getElementById('upload-placeholder').style.display = 'none';
+      document.getElementById('preview-wrap').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function quitarFoto(e) {
+    e.stopPropagation();
+    fotoBase64 = null;
+    document.getElementById('foto-preview').src = '';
+    document.getElementById('foto-input').value = '';
+    document.getElementById('upload-placeholder').style.display = 'block';
+    document.getElementById('preview-wrap').style.display = 'none';
+  }
+
+  function dragOver(e) { e.preventDefault(); document.getElementById('upload-zona').classList.add('drag-over'); }
+  function dragLeave() { document.getElementById('upload-zona').classList.remove('drag-over'); }
+  function dropFoto(e) {
+    e.preventDefault();
+    dragLeave();
+    const file = e.dataTransfer.files[0];
+    if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('foto-input').files = dt.files; subirFoto(document.getElementById('foto-input')); }
+  }
+
+  // ─── Generar ───────────────────────────────────────────────────────────────
+
   async function generar() {
     const key = document.getElementById('fal-key').value.trim() || sessionStorage.getItem('fal_key') || '';
-    if (!key) { alert('Por favor ingresa tu FAL_KEY primero'); return; }
-
-    const promptCustom = document.getElementById('prompt-custom').value.trim();
-    const negativo = document.getElementById('prompt-negativo').value.trim();
-    const formato = document.getElementById('formato').value;
-    const cantidad = parseInt(document.getElementById('cantidad').value);
-    const [ancho, alto] = formato.split('x').map(Number);
-
-    let prompt;
-    if (promptCustom) {
-      prompt = promptCustom + ', mi eelo brand, Guatemalan artisan brand, warm earthy tones, authentic, handcrafted quality';
-    } else if (guiaActual) {
-      prompt = GUIAS[guiaActual].prompt;
-    } else {
-      alert('Elige una guía o escribe un prompt personalizado');
-      return;
-    }
+    if (!key) { alert('Ingresa tu FAL_KEY primero'); return; }
 
     const btn = document.getElementById('btn-generar');
     const estado = document.getElementById('estado');
@@ -191,14 +370,51 @@ const HTML = `<!DOCTYPE html>
     estado.style.display = 'block';
     errorDiv.style.display = 'none';
 
+    let payload;
+
     try {
+      if (modoActual === 'crear') {
+        // Modo texto → imagen
+        const promptCustom = document.getElementById('prompt-custom').value.trim();
+        const negativo = document.getElementById('prompt-negativo').value.trim();
+        const [ancho, alto] = document.getElementById('formato-crear').value.split('x').map(Number);
+        const cantidad = parseInt(document.getElementById('cantidad-crear').value);
+
+        let prompt;
+        if (promptCustom) {
+          prompt = promptCustom + ', mi eelo brand, Guatemalan artisan brand, warm earthy tones, authentic, handcrafted quality';
+        } else if (guiaActual) {
+          prompt = GUIAS[guiaActual].prompt;
+        } else {
+          alert('Elige una guía de estilo o escribe tu descripción'); btn.disabled = false; estado.style.display = 'none'; return;
+        }
+        payload = { modo: 'crear', prompt, negativo, ancho, alto, cantidad, key };
+
+      } else {
+        // Modo foto → imagen
+        if (!fotoBase64) { alert('Sube una foto primero'); btn.disabled = false; estado.style.display = 'none'; return; }
+        const promptFoto = document.getElementById('prompt-foto').value.trim();
+        const fuerza = parseInt(document.getElementById('fuerza').value) / 100;
+        const [ancho, alto] = document.getElementById('formato-foto').value.split('x').map(Number);
+        const cantidad = parseInt(document.getElementById('cantidad-foto').value);
+
+        let prompt;
+        if (promptFoto) {
+          prompt = promptFoto + ', mi eelo brand, warm earthy tones, high quality, authentic';
+        } else if (transfActual && TRANSFORMACIONES[transfActual]) {
+          prompt = TRANSFORMACIONES[transfActual];
+        } else {
+          alert('Elige un tipo de transformación o escribe tu descripción'); btn.disabled = false; estado.style.display = 'none'; return;
+        }
+        payload = { modo: 'foto', prompt, fotoBase64, fuerza, ancho, alto, cantidad, key };
+      }
+
       const res = await fetch('/generar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, negativo, ancho, alto, cantidad, key })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
-
       if (!res.ok || data.error) throw new Error(data.error || 'Error desconocido');
 
       const galeria = document.getElementById('galeria');
@@ -206,7 +422,9 @@ const HTML = `<!DOCTYPE html>
       data.imagenes.forEach((url, i) => {
         const wrap = document.createElement('div');
         wrap.className = 'img-wrap';
-        wrap.innerHTML = \`<a href="\${url}" target="_blank"><img src="\${url}" alt="Imagen generada \${i+1}"></a><a class="descargar" href="\${url}" download="mieelo_\${Date.now()}_\${i+1}.png">⬇ Descargar</a>\`;
+        wrap.innerHTML =
+          '<a href="' + url + '" target="_blank"><img src="' + url + '" alt="Imagen ' + (i+1) + '"></a>' +
+          '<div class="img-acciones"><a href="' + url + '" download="mieelo_' + Date.now() + '_' + (i+1) + '.png">⬇ Descargar</a><a href="' + url + '" target="_blank">🔍 Ver</a></div>';
         galeria.appendChild(wrap);
       });
 
@@ -236,43 +454,71 @@ const server = http.createServer(async (req, res) => {
     req.on("data", chunk => body += chunk);
     req.on("end", async () => {
       try {
-        const { prompt, negativo, ancho, alto, cantidad, key } = JSON.parse(body);
+        const data = JSON.parse(body);
+        const { modo, prompt, key, ancho, alto, cantidad } = data;
 
-        if (!key) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: "Falta la FAL_KEY" }));
-          return;
-        }
+        if (!key) throw new Error("Falta la FAL_KEY");
 
         fal.config({ credentials: key });
 
-        console.log(`\n🎨 Generando ${cantidad} imagen(es)...`);
-        console.log(`   ${prompt.substring(0, 80)}...`);
+        let resultado;
 
-        const resultado = await fal.run("fal-ai/nano-banana-2", {
-          input: {
-            prompt,
-            negative_prompt: negativo || "",
-            image_size: { width: ancho || 1024, height: alto || 1024 },
-            num_inference_steps: 28,
-            guidance_scale: 3.5,
-            num_images: cantidad || 1,
-            enable_safety_checker: true
-          }
-        });
+        if (modo === "crear") {
+          // Texto → imagen con nano-banana-2
+          console.log(`\n✨ [texto→imagen] ${prompt.substring(0, 70)}...`);
+          resultado = await fal.run("fal-ai/nano-banana-2", {
+            input: {
+              prompt,
+              negative_prompt: data.negativo || "",
+              image_size: { width: ancho || 1024, height: alto || 1024 },
+              num_inference_steps: 28,
+              guidance_scale: 3.5,
+              num_images: cantidad || 1,
+              enable_safety_checker: true
+            }
+          });
+
+        } else {
+          // Foto → imagen con FLUX img2img
+          console.log(`\n📷 [foto→imagen] fuerza=${data.fuerza} · ${prompt.substring(0, 70)}...`);
+
+          // Sube la imagen a fal.ai storage primero
+          const base64Data = data.fotoBase64.replace(/^data:image\/\w+;base64,/, "");
+          const imgBuffer = Buffer.from(base64Data, "base64");
+          const mimeType = data.fotoBase64.match(/data:(image\/\w+);/)?.[1] || "image/jpeg";
+
+          // Subir imagen como archivo temporal
+          const uploadResult = await fal.storage.upload(
+            new Blob([imgBuffer], { type: mimeType }),
+            { filename: "referencia.jpg" }
+          );
+          const imageUrl = uploadResult;
+
+          resultado = await fal.run("fal-ai/flux/dev/image-to-image", {
+            input: {
+              prompt,
+              image_url: imageUrl,
+              strength: data.fuerza || 0.7,
+              image_size: { width: ancho || 1024, height: alto || 1024 },
+              num_inference_steps: 28,
+              guidance_scale: 3.5,
+              num_images: cantidad || 1,
+              enable_safety_checker: true
+            }
+          });
+        }
 
         const urls = (resultado?.images || []).map(img => img.url).filter(Boolean);
-
-        if (!urls.length) throw new Error("No se generaron imágenes");
+        if (!urls.length) throw new Error("No se generaron imágenes. Intenta con un prompt diferente.");
 
         console.log(`✅ ${urls.length} imagen(es) generadas`);
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ imagenes: urls }));
 
       } catch (err) {
-        console.error("❌", err.message);
+        console.error("❌", err.message || err);
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: err.message || "Error al generar" }));
+        res.end(JSON.stringify({ error: err.message || "Error al generar la imagen" }));
       }
     });
     return;
