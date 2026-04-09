@@ -196,24 +196,27 @@ const HTML = `<!DOCTYPE html>
     </div>
 
     <div class="panel">
-      <h2>Tu foto de referencia</h2>
+      <h2>Tus fotos de referencia</h2>
       <div class="upload-zona" id="upload-zona" onclick="document.getElementById('foto-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFoto(event)">
-        <div id="upload-placeholder">
-          <div class="icono">📂</div>
-          <strong>3 formas de agregar tu foto:</strong>
-          <p style="margin-top:0.75rem; line-height:2; color:#aaa;">
-            📁 <b style="color:#f0ebe5">Haz clic aquí</b> para buscar en tus archivos<br>
-            🖱️ <b style="color:#f0ebe5">Arrastra</b> la foto desde tu carpeta hasta aquí<br>
-            📋 <b style="color:#f0ebe5">Ctrl + V</b> para pegar desde el portapapeles
-          </p>
-          <p style="margin-top:0.5rem; font-size:0.75rem; color:#666;">JPG, PNG, WEBP · Máximo 10MB</p>
-        </div>
-        <div id="preview-wrap" class="preview-wrap" style="display:none">
-          <img id="foto-preview" src="" alt="Vista previa">
-          <button class="btn-quitar" onclick="quitarFoto(event)">✕ Quitar foto</button>
-        </div>
+        <div class="icono">📂</div>
+        <strong>Agrega todas las fotos que quieras</strong>
+        <p style="margin-top:0.6rem; line-height:2; color:#aaa; font-size:0.875rem;">
+          📁 <b style="color:#f0ebe5">Haz clic</b> para buscar (puedes seleccionar varias a la vez)<br>
+          🖱️ <b style="color:#f0ebe5">Arrastra</b> desde tu carpeta (varias a la vez)<br>
+          📋 <b style="color:#f0ebe5">Ctrl+V</b> para pegar desde el portapapeles
+        </p>
+        <p style="margin-top:0.4rem; font-size:0.72rem; color:#555;">JPG, PNG, WEBP · Máx 10MB por foto</p>
       </div>
-      <input type="file" id="foto-input" accept="image/*" onchange="subirFoto(this)">
+      <input type="file" id="foto-input" accept="image/*" multiple onchange="agregarFotos(this.files)">
+
+      <!-- Grid de miniaturas -->
+      <div id="fotos-grid" style="display:none; margin-top:1rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.6rem;">
+          <p style="font-size:0.75rem; color:#aaa; letter-spacing:0.08em; text-transform:uppercase;">Haz clic en una foto para seleccionarla como referencia</p>
+          <button class="btn-sm" onclick="limpiarFotos()">✕ Quitar todas</button>
+        </div>
+        <div id="miniaturas" style="display:flex; flex-wrap:wrap; gap:0.6rem;"></div>
+      </div>
     </div>
 
     <div class="panel">
@@ -284,7 +287,8 @@ const HTML = `<!DOCTYPE html>
   let modoActual = 'crear';
   let guiaActual = null;
   let transfActual = null;
-  let fotoBase64 = null;
+  let fotos = [];           // Array de { nombre, base64 }
+  let fotoSeleccionada = null; // base64 de la activa
 
   window.onload = () => {
     const k = sessionStorage.getItem('fal_key');
@@ -329,40 +333,70 @@ const HTML = `<!DOCTYPE html>
     }
   }
 
-  // Upload foto
-  function subirFoto(input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { alert('La foto es muy grande. Máximo 10MB.'); return; }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      fotoBase64 = e.target.result;
-      document.getElementById('foto-preview').src = fotoBase64;
-      document.getElementById('upload-placeholder').style.display = 'none';
-      document.getElementById('preview-wrap').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+  // ─── Gestión de múltiples fotos ───────────────────────────────────────────
+
+  function agregarFotos(fileList) {
+    Array.from(fileList).forEach(file => {
+      if (file.size > 10 * 1024 * 1024) { alert(file.name + ' es muy grande (máx 10MB)'); return; }
+      if (!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        fotos.push({ nombre: file.name, base64: e.target.result });
+        renderMiniaturas();
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
-  function quitarFoto(e) {
+  function renderMiniaturas() {
+    const grid = document.getElementById('fotos-grid');
+    const cont = document.getElementById('miniaturas');
+    if (!fotos.length) { grid.style.display = 'none'; fotoSeleccionada = null; return; }
+    grid.style.display = 'block';
+    cont.innerHTML = '';
+    fotos.forEach((f, i) => {
+      const wrap = document.createElement('div');
+      const esActiva = fotoSeleccionada === f.base64;
+      wrap.style.cssText = 'position:relative; cursor:pointer; border-radius:6px; overflow:hidden; border:3px solid ' + (esActiva ? '#C97B5A' : 'transparent') + '; transition:border 0.15s;';
+      wrap.innerHTML =
+        '<img src="' + f.base64 + '" style="width:110px; height:110px; object-fit:cover; display:block;">' +
+        '<div style="position:absolute;top:0;right:0;background:rgba(0,0,0,0.6);padding:0.2rem 0.4rem;font-size:0.7rem;color:white;cursor:pointer;" onclick="quitarFoto(event,' + i + ')">✕</div>' +
+        (esActiva ? '<div style="position:absolute;bottom:0;left:0;right:0;background:#C97B5A;text-align:center;font-size:0.65rem;padding:0.2rem;color:white;letter-spacing:0.05em;">SELECCIONADA</div>' : '');
+      wrap.onclick = (e) => { if (e.target.textContent === '✕') return; seleccionarFoto(f.base64); };
+      cont.appendChild(wrap);
+    });
+    // Auto-selecciona la primera si no hay ninguna seleccionada
+    if (!fotoSeleccionada && fotos.length) seleccionarFoto(fotos[0].base64);
+  }
+
+  function seleccionarFoto(base64) {
+    fotoSeleccionada = base64;
+    renderMiniaturas();
+  }
+
+  function quitarFoto(e, idx) {
     e.stopPropagation();
-    fotoBase64 = null;
-    document.getElementById('foto-preview').src = '';
+    const eraActiva = fotos[idx]?.base64 === fotoSeleccionada;
+    fotos.splice(idx, 1);
+    if (eraActiva) fotoSeleccionada = fotos[0]?.base64 || null;
     document.getElementById('foto-input').value = '';
-    document.getElementById('upload-placeholder').style.display = 'block';
-    document.getElementById('preview-wrap').style.display = 'none';
+    renderMiniaturas();
+  }
+
+  function limpiarFotos() {
+    fotos = []; fotoSeleccionada = null;
+    document.getElementById('foto-input').value = '';
+    renderMiniaturas();
   }
 
   function dragOver(e) { e.preventDefault(); document.getElementById('upload-zona').classList.add('drag-over'); }
   function dragLeave() { document.getElementById('upload-zona').classList.remove('drag-over'); }
   function dropFoto(e) {
-    e.preventDefault();
-    dragLeave();
-    const file = e.dataTransfer.files[0];
-    if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('foto-input').files = dt.files; subirFoto(document.getElementById('foto-input')); }
+    e.preventDefault(); dragLeave();
+    if (e.dataTransfer.files.length) agregarFotos(e.dataTransfer.files);
   }
 
-  // Pegar con Ctrl+V desde portapapeles
+  // Pegar con Ctrl+V
   document.addEventListener('paste', function(e) {
     if (modoActual !== 'foto') return;
     const items = e.clipboardData?.items;
@@ -373,11 +407,8 @@ const HTML = `<!DOCTYPE html>
         if (!file) continue;
         const reader = new FileReader();
         reader.onload = (ev) => {
-          fotoBase64 = ev.target.result;
-          document.getElementById('foto-preview').src = fotoBase64;
-          document.getElementById('upload-placeholder').style.display = 'none';
-          document.getElementById('preview-wrap').style.display = 'block';
-          // Feedback visual
+          fotos.push({ nombre: 'pegada.png', base64: ev.target.result });
+          renderMiniaturas();
           const zona = document.getElementById('upload-zona');
           zona.style.borderColor = '#7ab87a';
           setTimeout(() => zona.style.borderColor = '', 1500);
@@ -423,7 +454,7 @@ const HTML = `<!DOCTYPE html>
 
       } else {
         // Modo foto → imagen
-        if (!fotoBase64) { alert('Sube una foto primero'); btn.disabled = false; estado.style.display = 'none'; return; }
+        if (!fotoSeleccionada) { alert('Sube al menos una foto y selecciónala'); btn.disabled = false; estado.style.display = 'none'; return; }
         const promptFoto = document.getElementById('prompt-foto').value.trim();
         const fuerza = parseInt(document.getElementById('fuerza').value) / 100;
         const [ancho, alto] = document.getElementById('formato-foto').value.split('x').map(Number);
@@ -437,7 +468,7 @@ const HTML = `<!DOCTYPE html>
         } else {
           alert('Elige un tipo de transformación o escribe tu descripción'); btn.disabled = false; estado.style.display = 'none'; return;
         }
-        payload = { modo: 'foto', prompt, fotoBase64, fuerza, ancho, alto, cantidad, key };
+        payload = { modo: 'foto', prompt, fotoBase64: fotoSeleccionada, fuerza, ancho, alto, cantidad, key };
       }
 
       const res = await fetch('/generar', {
