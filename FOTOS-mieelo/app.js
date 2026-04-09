@@ -200,12 +200,17 @@ const HTML = `<!DOCTYPE html>
       <div class="upload-zona" id="upload-zona" onclick="document.getElementById('foto-input').click()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFoto(event)">
         <div id="upload-placeholder">
           <div class="icono">📂</div>
-          <strong>Haz clic o arrastra tu foto aquí</strong>
-          <p>JPG, PNG, WEBP · Máximo 10MB</p>
+          <strong>3 formas de agregar tu foto:</strong>
+          <p style="margin-top:0.75rem; line-height:2; color:#aaa;">
+            📁 <b style="color:#f0ebe5">Haz clic aquí</b> para buscar en tus archivos<br>
+            🖱️ <b style="color:#f0ebe5">Arrastra</b> la foto desde tu carpeta hasta aquí<br>
+            📋 <b style="color:#f0ebe5">Ctrl + V</b> para pegar desde el portapapeles
+          </p>
+          <p style="margin-top:0.5rem; font-size:0.75rem; color:#666;">JPG, PNG, WEBP · Máximo 10MB</p>
         </div>
         <div id="preview-wrap" class="preview-wrap" style="display:none">
           <img id="foto-preview" src="" alt="Vista previa">
-          <button class="btn-quitar" onclick="quitarFoto(event)">✕ Quitar</button>
+          <button class="btn-quitar" onclick="quitarFoto(event)">✕ Quitar foto</button>
         </div>
       </div>
       <input type="file" id="foto-input" accept="image/*" onchange="subirFoto(this)">
@@ -356,6 +361,32 @@ const HTML = `<!DOCTYPE html>
     const file = e.dataTransfer.files[0];
     if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('foto-input').files = dt.files; subirFoto(document.getElementById('foto-input')); }
   }
+
+  // Pegar con Ctrl+V desde portapapeles
+  document.addEventListener('paste', function(e) {
+    if (modoActual !== 'foto') return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (!file) continue;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          fotoBase64 = ev.target.result;
+          document.getElementById('foto-preview').src = fotoBase64;
+          document.getElementById('upload-placeholder').style.display = 'none';
+          document.getElementById('preview-wrap').style.display = 'block';
+          // Feedback visual
+          const zona = document.getElementById('upload-zona');
+          zona.style.borderColor = '#7ab87a';
+          setTimeout(() => zona.style.borderColor = '', 1500);
+        };
+        reader.readAsDataURL(file);
+        break;
+      }
+    }
+  });
 
   // ─── Generar ───────────────────────────────────────────────────────────────
 
