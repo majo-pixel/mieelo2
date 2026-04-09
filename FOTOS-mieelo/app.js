@@ -579,8 +579,17 @@ const server = http.createServer(async (req, res) => {
 
       } catch (err) {
         console.error("❌", err.message || err);
+        const msg = err.message || "";
+        let errorAmigable = msg;
+        if (msg.includes("Forbidden") || msg.includes("403") || msg.includes("unauthorized") || msg.includes("Unauthorized")) {
+          errorAmigable = "Clave API inválida o sin permisos. Ve a fal.ai/dashboard/keys, crea una clave nueva y pégala en el campo FAL_KEY de la app.";
+        } else if (msg.includes("quota") || msg.includes("credit") || msg.includes("402")) {
+          errorAmigable = "Sin créditos disponibles en fal.ai. Recarga tu cuenta en fal.ai/dashboard/billing.";
+        } else if (msg.includes("timeout") || msg.includes("ETIMEDOUT")) {
+          errorAmigable = "La generación tardó demasiado. Intenta con menos pasos o una imagen más pequeña.";
+        }
         res.writeHead(500, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ error: err.message || "Error al generar la imagen" }));
+        res.end(JSON.stringify({ error: errorAmigable }));
       }
     });
     return;
