@@ -1,0 +1,498 @@
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="manifiesto section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }} spacing-style"
+  style="{% render 'spacing-style', settings: section.settings %}"
+>
+  <div class="manifiesto__grid">
+
+    {%- comment -%} Columna izquierda {%- endcomment -%}
+    <div class="manifiesto__left">
+
+      {%- if section.settings.etiqueta != blank -%}
+        <p class="manifiesto__etiqueta" style="color: {{ section.settings.etiqueta_color }}; font-size: {{ section.settings.etiqueta_tamano }}; font-family: {{ section.settings.etiqueta_fuente }};">{{ section.settings.etiqueta }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.frase_principal != blank -%}
+        <h2 class="manifiesto__frase rte" style="color: {{ section.settings.frase_color }}; font-size: {{ section.settings.frase_tamano }}; font-family: {{ section.settings.frase_fuente }}; font-weight: {{ section.settings.frase_peso }};">{{ section.settings.frase_principal }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.cita != blank -%}
+        <div class="manifiesto__cita-wrap" style="border-left-color: {{ section.settings.cita_borde_color }}; border-left-width: {{ section.settings.cita_borde_grosor }}px;">
+          <p class="manifiesto__cita" style="color: {{ section.settings.cita_color }}; font-size: {{ section.settings.cita_tamano }}; font-family: {{ section.settings.cita_fuente }}; font-style: italic;">{{ section.settings.cita }}</p>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.firma != blank -%}
+        <div class="manifiesto__firma-wrap">
+          {%- if section.settings.firma_decoracion -%}
+            <div class="manifiesto__firma-linea" style="background: linear-gradient(to right, {{ section.settings.color_destacado }}, {{ section.settings.cita_borde_color }});"></div>
+          {%- endif -%}
+          <p class="manifiesto__firma" style="color: {{ section.settings.firma_color }}; font-size: {{ section.settings.firma_tamano }}; font-family: {{ section.settings.firma_fuente }}; letter-spacing: 0.1em;">{{ section.settings.firma }}</p>
+        </div>
+      {%- endif -%}
+
+    </div>
+
+    {%- comment -%} Columna derecha — pills/tags interactivas {%- endcomment -%}
+    <div class="manifiesto__right">
+      {%- for block in section.blocks -%}
+        <button
+          class="manifiesto__pill{% if block.settings.activo %} manifiesto__pill--activo{% endif %}"
+          style="
+            --pill-color-activo: {{ block.settings.color_activo }};
+            --pill-texto-activo: {{ block.settings.texto_activo }};
+            --pill-color-inactivo: {{ section.settings.pill_fondo_inactivo }};
+            --pill-texto-inactivo: {{ section.settings.pill_color_inactivo }};
+            --pill-borde: {{ section.settings.pill_borde_color }};
+            font-size: {{ section.settings.pill_tamano }};
+            font-family: {{ section.settings.pill_fuente }};
+            border-radius: {{ section.settings.pill_radio }}px;
+          "
+          {{ block.shopify_attributes }}
+        >
+          {{ block.settings.texto }}
+        </button>
+      {%- endfor -%}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  (function() {
+    var pills = document.querySelectorAll('.manifiesto__pill');
+    pills.forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        pills.forEach(function(p) { p.classList.remove('manifiesto__pill--activo'); });
+        this.classList.add('manifiesto__pill--activo');
+      });
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  .manifiesto__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .manifiesto__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 5rem;
+    }
+  }
+
+  .manifiesto__left {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .manifiesto__etiqueta {
+    margin: 0;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .manifiesto__frase {
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .manifiesto__frase p { margin: 0; }
+
+  .manifiesto__cita-wrap {
+    border-left: 3px solid;
+    padding-left: 1.25rem;
+  }
+
+  .manifiesto__cita {
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  .manifiesto__firma-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-top: 0.5rem;
+  }
+
+  .manifiesto__firma-linea {
+    height: 2px;
+    width: 60px;
+    border-radius: 2px;
+  }
+
+  .manifiesto__firma {
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  /* Pills lado derecho */
+  .manifiesto__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .manifiesto__right {
+      align-items: flex-end;
+    }
+  }
+
+  .manifiesto__pill {
+    cursor: pointer;
+    padding: 0.65rem 1.5rem;
+    border: 1px solid var(--pill-borde);
+    background-color: var(--pill-color-inactivo);
+    color: var(--pill-texto-inactivo);
+    border-radius: var(--pill-radio, 50px);
+    transition: background-color 0.25s, color 0.25s, transform 0.2s;
+    white-space: nowrap;
+  }
+
+  .manifiesto__pill:hover {
+    transform: translateX(-4px);
+    opacity: 0.85;
+  }
+
+  @media screen and (max-width: 749px) {
+    .manifiesto__pill:hover {
+      transform: none;
+    }
+  }
+
+  .manifiesto__pill--activo {
+    background-color: var(--pill-color-activo);
+    color: var(--pill-texto-activo);
+    border-color: var(--pill-color-activo);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Manifiesto",
+  "tag": "section",
+  "class": "section-wrapper",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Valor / Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "texto",
+          "label": "Texto",
+          "default": "Noble Humans"
+        },
+        {
+          "type": "checkbox",
+          "id": "activo",
+          "label": "Mostrar como activo por defecto",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "color_activo",
+          "label": "Color fondo activo",
+          "default": "#C97B5A"
+        },
+        {
+          "type": "color",
+          "id": "texto_activo",
+          "label": "Color texto activo",
+          "default": "#ffffff"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Etiqueta"
+    },
+    {
+      "type": "text",
+      "id": "etiqueta",
+      "label": "Texto",
+      "default": "OUR REASON FOR BEING"
+    },
+    {
+      "type": "color",
+      "id": "etiqueta_color",
+      "label": "Color",
+      "default": "#999999"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    },
+    {
+      "type": "select",
+      "id": "etiqueta_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Frase principal"
+    },
+    {
+      "type": "richtext",
+      "id": "frase_principal",
+      "label": "Frase",
+      "default": "<p>\"Every bag begins<br>with the name of <em>a woman.\"</em></p>",
+      "info": "Usa cursiva y colores desde la barra de herramientas"
+    },
+    {
+      "type": "color",
+      "id": "frase_color",
+      "label": "Color",
+      "default": "#2C2C2C"
+    },
+    {
+      "type": "color",
+      "id": "color_destacado",
+      "label": "Color destacado (palabra en cursiva)",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "select",
+      "id": "frase_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "1.5rem", "label": "24px" },
+        { "value": "2rem", "label": "32px" },
+        { "value": "2.5rem", "label": "40px" },
+        { "value": "clamp(1.75rem, 3.5vw, 3rem)", "label": "Fluido" }
+      ],
+      "default": "clamp(1.75rem, 3.5vw, 3rem)"
+    },
+    {
+      "type": "select",
+      "id": "frase_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-heading--family)"
+    },
+    {
+      "type": "select",
+      "id": "frase_peso",
+      "label": "Peso",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-negrita" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "header",
+      "content": "Cita secundaria"
+    },
+    {
+      "type": "textarea",
+      "id": "cita",
+      "label": "Texto",
+      "default": "\"Patience, the greatest of sciences.\nDrive, the greatest of energies.\""
+    },
+    {
+      "type": "color",
+      "id": "cita_color",
+      "label": "Color",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "select",
+      "id": "cita_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" },
+        { "value": "1.125rem", "label": "18px" }
+      ],
+      "default": "1rem"
+    },
+    {
+      "type": "select",
+      "id": "cita_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-heading--family)"
+    },
+    {
+      "type": "color",
+      "id": "cita_borde_color",
+      "label": "Color del borde izquierdo",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "range",
+      "id": "cita_borde_grosor",
+      "label": "Grosor del borde",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "unit": "px",
+      "default": 3
+    },
+    {
+      "type": "header",
+      "content": "Firma"
+    },
+    {
+      "type": "text",
+      "id": "firma",
+      "label": "Texto",
+      "default": "MI EELO · GUATEMALA CITY · SINCE 2017"
+    },
+    {
+      "type": "color",
+      "id": "firma_color",
+      "label": "Color",
+      "default": "#aaaaaa"
+    },
+    {
+      "type": "select",
+      "id": "firma_tamano",
+      "label": "Tamaño",
+      "options": [
+        { "value": "0.625rem", "label": "10px" },
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" }
+      ],
+      "default": "0.75rem"
+    },
+    {
+      "type": "select",
+      "id": "firma_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "checkbox",
+      "id": "firma_decoracion",
+      "label": "Mostrar línea decorativa",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Pills / Valores"
+    },
+    {
+      "type": "color",
+      "id": "pill_fondo_inactivo",
+      "label": "Fondo inactivo",
+      "default": "#00000000"
+    },
+    {
+      "type": "color",
+      "id": "pill_color_inactivo",
+      "label": "Color texto inactivo",
+      "default": "#3A3A3A"
+    },
+    {
+      "type": "color",
+      "id": "pill_borde_color",
+      "label": "Color borde",
+      "default": "#3A3A3A"
+    },
+    {
+      "type": "range",
+      "id": "pill_radio",
+      "label": "Bordes redondeados",
+      "min": 0,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "select",
+      "id": "pill_tamano",
+      "label": "Tamaño texto",
+      "options": [
+        { "value": "0.75rem", "label": "12px" },
+        { "value": "0.875rem", "label": "14px" },
+        { "value": "1rem", "label": "16px" }
+      ],
+      "default": "0.875rem"
+    },
+    {
+      "type": "select",
+      "id": "pill_fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "var(--font-body--family)", "label": "Cuerpo" },
+        { "value": "var(--font-heading--family)", "label": "Título" },
+        { "value": "var(--font-accent--family)", "label": "Acento" }
+      ],
+      "default": "var(--font-body--family)"
+    },
+    {
+      "type": "header",
+      "content": "Estilo"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Ancho",
+      "options": [
+        { "value": "page-width", "label": "Página" },
+        { "value": "full-width", "label": "Completo" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Esquema de color",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Manifiesto",
+      "blocks": [
+        { "type": "pill", "settings": { "texto": "Noble Humans", "activo": false } },
+        { "type": "pill", "settings": { "texto": "Honest Materials", "activo": true } },
+        { "type": "pill", "settings": { "texto": "Made in Guatemala", "activo": false } },
+        { "type": "pill", "settings": { "texto": "1 product = 1 opportunity", "activo": false } },
+        { "type": "pill", "settings": { "texto": "Co-creation", "activo": false } }
+      ]
+    }
+  ]
+}
+{% endschema %}
