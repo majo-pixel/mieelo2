@@ -60,7 +60,7 @@ const HTML = `<!DOCTYPE html>
   .panel h2 { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #777; margin-bottom: 1.2rem; }
 
   /* Key */
-  .key-bar { display: flex; gap: 0.5rem; align-items: center; background: #252220; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; }
+  .key-bar { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; background: #252220; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1rem; }
   .key-bar label { font-size: 0.75rem; letter-spacing: 0.08em; color: #aaa; text-transform: uppercase; white-space: nowrap; }
   .key-bar input { flex: 1; background: #1a1714; border: 1px solid #3a3632; border-radius: 4px; color: #f0ebe5; padding: 0.5rem 0.75rem; font-family: inherit; font-size: 0.85rem; }
   .key-bar input:focus { outline: none; border-color: #C97B5A; }
@@ -133,8 +133,10 @@ const HTML = `<!DOCTYPE html>
     <label>FAL_KEY</label>
     <input type="password" id="fal-key" placeholder="fal_sk_..." oninput="verificarKey()">
     <button class="btn-sm" onclick="guardarKey()">Guardar</button>
+    <button class="btn-sm" onclick="probarKey()" id="btn-probar">Probar clave ▶</button>
     <span class="key-ok" id="key-ok" style="display:none">✓ Lista</span>
   </div>
+  <div id="test-resultado" style="display:none; padding:0.6rem 1rem; border-radius:6px; font-size:0.85rem; margin-bottom:1rem;"></div>
 
   <!-- Selector de modo -->
   <div class="modos">
@@ -303,6 +305,33 @@ const HTML = `<!DOCTYPE html>
   function guardarKey() {
     const k = document.getElementById('fal-key').value.trim();
     if (k) { sessionStorage.setItem('fal_key', k); verificarKey(); }
+  }
+
+  async function probarKey() {
+    const k = document.getElementById('fal-key').value.trim() || sessionStorage.getItem('fal_key') || '';
+    if (!k) { alert('Pega tu FAL_KEY primero'); return; }
+    const div = document.getElementById('test-resultado');
+    const btn = document.getElementById('btn-probar');
+    btn.textContent = '⏳ Probando...'; btn.disabled = true;
+    div.style.display = 'block';
+    div.style.background = '#252220'; div.style.color = '#aaa'; div.style.border = '1px solid #3a3632';
+    div.textContent = 'Verificando clave con fal.ai...';
+    try {
+      const res = await fetch('/test-key', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ key: k }) });
+      const data = await res.json();
+      if (data.ok) {
+        div.style.background = '#1e2a1e'; div.style.color = '#7ab87a'; div.style.border = '1px solid #7ab87a';
+        div.textContent = '✓ Clave válida — ya puedes generar imágenes';
+        guardarKey();
+      } else {
+        div.style.background = '#3a1a1a'; div.style.color = '#e8a8a8'; div.style.border = '1px solid #c97b5a';
+        div.textContent = '✗ ' + (data.error || 'Clave inválida');
+      }
+    } catch(e) {
+      div.style.background = '#3a1a1a'; div.style.color = '#e8a8a8'; div.style.border = '1px solid #c97b5a';
+      div.textContent = '✗ No se pudo conectar al servidor';
+    }
+    btn.textContent = 'Probar clave ▶'; btn.disabled = false;
   }
 
   function cambiarModo(modo) {
@@ -508,6 +537,38 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && req.url === "/") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     res.end(HTML);
+    return;
+  }
+
+  if (req.method === "POST" && req.url === "/test-key") {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+    req.on("end", async () => {
+      try {
+        const { key } = JSON.parse(body);
+        if (!key) throw new Error("Falta la clave");
+        fal.config({ credentials: key });
+        // Prueba mínima: genera 1 imagen pequeña y rápida
+        await fal.run("fal-ai/nano-banana-2", {
+          input: {
+            prompt: "a small brown leather bag",
+            image_size: { width: 256, height: 256 },
+            num_inference_steps: 4,
+            num_images: 1,
+            enable_safety_checker: false
+          }
+        });
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: true }));
+      } catch (err) {
+        const msg = err.message || "";
+        let errorAmigable = "Clave inválida o error de conexión";
+        if (msg.includes("Forbidden") || msg.includes("403")) errorAmigable = "Clave inválida o sin permisos. Crea una nueva en fal.ai/dashboard/keys";
+        if (msg.includes("402") || msg.includes("credit")) errorAmigable = "Sin créditos. Recarga en fal.ai/dashboard/billing";
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ ok: false, error: errorAmigable }));
+      }
+    });
     return;
   }
 
