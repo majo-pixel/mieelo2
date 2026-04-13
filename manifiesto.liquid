@@ -59,17 +59,6 @@
   </div>
 </div>
 
-<script>
-  (function() {
-    var pills = document.querySelectorAll('.manifiesto__pill');
-    pills.forEach(function(pill) {
-      pill.addEventListener('click', function() {
-        pills.forEach(function(p) { p.classList.remove('manifiesto__pill--activo'); });
-        this.classList.add('manifiesto__pill--activo');
-      });
-    });
-  })();
-</script>
 
 {% stylesheet %}
   .manifiesto__grid {
@@ -148,25 +137,20 @@
   }
 
   .manifiesto__pill {
-    cursor: pointer;
+    cursor: default;
     padding: 0.65rem 1.5rem;
     border: 1px solid var(--pill-borde);
     background-color: var(--pill-color-inactivo);
     color: var(--pill-texto-inactivo);
     border-radius: var(--pill-radio, 50px);
-    transition: background-color 0.25s, color 0.25s, transform 0.2s;
+    transition: background-color 0.25s, color 0.25s, border-color 0.25s;
     white-space: nowrap;
   }
 
   .manifiesto__pill:hover {
-    transform: translateX(-4px);
-    opacity: 0.85;
-  }
-
-  @media screen and (max-width: 749px) {
-    .manifiesto__pill:hover {
-      transform: none;
-    }
+    background-color: var(--pill-color-activo);
+    color: var(--pill-texto-activo);
+    border-color: var(--pill-color-activo);
   }
 
   .manifiesto__pill--activo {
