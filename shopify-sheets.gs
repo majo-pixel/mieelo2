@@ -156,38 +156,87 @@ function obtenerUrlWebhook() {
   );
 }
 
-// ── 4. Importa pedidos existentes (opcional) ───────────
-function importarPedidosExistentes() {
+// ── 4. Importa desde CSV de Shopify ───────────────────
+function importarDesdeCSV() {
   var ui = SpreadsheetApp.getUi();
-  var respToken = ui.prompt(
-    "Importar pedidos existentes",
-    "Pega tu Shopify Admin API Token (empieza con shpat_):",
+  var resp = ui.prompt(
+    "Importar desde CSV de Shopify",
+    "Sube el CSV a Google Drive, ábrelo como Google Sheet, copia la URL de esa hoja y pégala aquí:",
     ui.ButtonSet.OK_CANCEL
   );
-  if (respToken.getSelectedButton() !== ui.Button.OK) return;
+  if (resp.getSelectedButton() !== ui.Button.OK) return;
 
-  var respTienda = ui.prompt(
-    "URL de tu tienda",
-    "Escribe tu tienda (ej: mi-eelo.myshopify.com):",
-    ui.ButtonSet.OK_CANCEL
-  );
-  if (respTienda.getSelectedButton() !== ui.Button.OK) return;
-
-  var token  = respToken.getResponseText().trim();
-  var tienda = respTienda.getResponseText().trim();
+  var urlCSV = resp.getResponseText().trim();
+  var idMatch = urlCSV.match(/\/d\/([a-zA-Z0-9-_]+)/);
+  if (!idMatch) { ui.alert("❌ URL inválida. Asegúrate de copiar la URL completa del Google Sheet."); return; }
 
   try {
-    var url = "https://" + tienda + "/admin/api/2024-01/orders.json?limit=250&status=any";
-    var resp = UrlFetchApp.fetch(url, {
-      headers: { "X-Shopify-Access-Token": token }
-    });
-    var data = JSON.parse(resp.getContentText());
-    var pedidos = data.orders || [];
+    var ss        = SpreadsheetApp.openById(idMatch[1]);
+    var hojaCSV   = ss.getSheets()[0];
+    var datos     = hojaCSV.getDataRange().getValues();
+    var encabezados = datos[0].map(function(h) { return String(h).trim(); });
 
-    pedidos.forEach(function(p) { agregarPedido(p); });
+    // Mapeo de columnas Shopify CSV → nuestras columnas
+    function col(nombre) {
+      var i = encabezados.indexOf(nombre);
+      return i >= 0 ? i : -1;
+    }
 
-    ui.alert("✅ Se importaron " + pedidos.length + " pedidos correctamente.");
+    var hojaPedidos = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(NOMBRE_HOJA);
+    if (!hojaPedidos) { ui.alert("❌ No se encontró la hoja 'Pedidos'. Ejecuta configurarHoja() primero."); return; }
+
+    var importados = 0;
+    var pedidosVistos = {};
+
+    for (var i = 1; i < datos.length; i++) {
+      var fila = datos[i];
+      var numero = String(fila[col("Name")] || "").trim();
+      if (!numero || pedidosVistos[numero]) continue; // evita duplicados por líneas de productos múltiples
+      pedidosVistos[numero] = true;
+
+      var fecha       = fila[col("Created at")] || "";
+      var cliente     = fila[col("Billing Name")] || fila[col("Shipping Name")] || "";
+      var email       = fila[col("Email")] || "";
+      var telefono    = fila[col("Billing Phone")] || fila[col("Shipping Phone")] || "";
+      var total       = fila[col("Total")] || "";
+      var moneda      = fila[col("Currency")] || "USD";
+      var estadoPago  = traducirEstado(String(fila[col("Financial Status")] || "").toLowerCase());
+      var estadoPrep  = traducirEstado(String(fila[col("Fulfillment Status")] || "unfulfilled").toLowerCase());
+      var direccion   = [fila[col("Shipping Address1")], fila[col("Shipping Address2")]].filter(Boolean).join(", ") || fila[col("Billing Street")] || "";
+      var ciudad      = fila[col("Shipping City")] || fila[col("Billing City")] || "";
+      var depto       = fila[col("Shipping Province Name")] || fila[col("Billing Province Name")] || fila[col("Shipping Province")] || "";
+      var pais        = fila[col("Shipping Country")] || fila[col("Billing Country")] || "";
+      var codigoPost  = fila[col("Shipping Zip")] || fila[col("Billing Zip")] || "";
+      var notas       = fila[col("Notes")] || "";
+
+      // Reúne todos los productos de este pedido (pueden estar en varias filas)
+      var productos = [];
+      for (var j = i; j < datos.length; j++) {
+        if (j > i && String(datos[j][col("Name")] || "").trim()) break;
+        var qty  = datos[j][col("Lineitem quantity")] || "";
+        var name = datos[j][col("Lineitem name")] || "";
+        if (qty && name) productos.push(qty + "x " + name);
+      }
+
+      var filaNum = hojaPedidos.getLastRow() + 1;
+      hojaPedidos.appendRow([
+        numero, fecha, cliente, email, telefono,
+        total, moneda, estadoPago, estadoPrep,
+        direccion, ciudad, depto, pais, codigoPost,
+        productos.length, productos.join(", "), notas
+      ]);
+
+      var color = (filaNum % 2 === 0) ? COLOR_FILA_PAR : COLOR_FILA_IMPAR;
+      hojaPedidos.getRange(filaNum, 1, 1, COLUMNAS.length).setBackground(color);
+      if (estadoPago === "Pagado")    hojaPedidos.getRange(filaNum, 8).setBackground("#d4edda").setFontColor("#155724");
+      if (estadoPago === "Pendiente") hojaPedidos.getRange(filaNum, 8).setBackground("#fff3cd").setFontColor("#856404");
+      if (estadoPago === "Anulado")   hojaPedidos.getRange(filaNum, 8).setBackground("#f8d7da").setFontColor("#721c24");
+
+      importados++;
+    }
+
+    ui.alert("✅ Se importaron " + importados + " pedidos desde el CSV.");
   } catch(err) {
-    ui.alert("❌ Error: " + err.message + "\n\nVerifica que el token y la tienda sean correctos.");
+    ui.alert("❌ Error: " + err.message);
   }
 }
