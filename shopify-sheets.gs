@@ -8,8 +8,9 @@
 var NOMBRE_HOJA = "Pedidos";
 var COLUMNAS = [
   "# Pedido", "Fecha", "Cliente", "Email", "Teléfono",
-  "País", "Ciudad", "Total (USD)", "Moneda",
-  "Estado pago", "Estado preparación", "Artículos", "Productos", "Notas"
+  "Total (USD)", "Moneda", "Estado pago", "Estado preparación",
+  "Dirección", "Ciudad", "Departamento", "País", "Código postal",
+  "Artículos", "Productos", "Notas"
 ];
 
 // Colores mi eelo
@@ -43,7 +44,7 @@ function configurarHoja() {
   hoja.setFrozenRows(1);
 
   // Anchos de columna
-  var anchos = [90, 140, 160, 200, 120, 100, 120, 110, 80, 120, 150, 80, 250, 200];
+  var anchos = [90, 140, 160, 200, 120, 110, 80, 120, 150, 220, 120, 140, 100, 100, 80, 250, 200];
   anchos.forEach(function(a, i) { hoja.setColumnWidth(i + 1, a); });
 
   // Altura de fila de encabezado
@@ -94,12 +95,16 @@ function agregarPedido(pedido) {
   cliente = cliente.trim() || (pedido.billing_address || {}).name || "—";
   var email      = (pedido.customer || {}).email || pedido.email || "—";
   var telefono   = (pedido.customer || {}).phone || (pedido.billing_address || {}).phone || "—";
-  var pais       = (pedido.billing_address || {}).country || "—";
-  var ciudad     = (pedido.billing_address || {}).city || "—";
   var total      = pedido.total_price || "0.00";
   var moneda     = pedido.currency || "USD";
   var estadoPago = traducirEstado(pedido.financial_status);
   var estadoPrep = traducirEstado(pedido.fulfillment_status || "unfulfilled");
+  var envio      = pedido.shipping_address || pedido.billing_address || {};
+  var direccion  = [envio.address1, envio.address2].filter(Boolean).join(", ") || "—";
+  var ciudad     = envio.city || "—";
+  var depto      = envio.province || "—";
+  var pais       = envio.country || "—";
+  var codigoPost = envio.zip || "—";
   var cantArt    = (pedido.line_items || []).length;
   var productos  = (pedido.line_items || []).map(function(item) {
                      return item.quantity + "x " + item.name;
@@ -108,8 +113,10 @@ function agregarPedido(pedido) {
 
   // Agrega fila
   var fila = hoja.getLastRow() + 1;
-  hoja.appendRow([numero, fecha, cliente, email, telefono, pais, ciudad,
-                  total, moneda, estadoPago, estadoPrep, cantArt, productos, notas]);
+  hoja.appendRow([numero, fecha, cliente, email, telefono,
+                  total, moneda, estadoPago, estadoPrep,
+                  direccion, ciudad, depto, pais, codigoPost,
+                  cantArt, productos, notas]);
 
   // Color alterno de filas
   var color = (fila % 2 === 0) ? COLOR_FILA_PAR : COLOR_FILA_IMPAR;
@@ -117,7 +124,7 @@ function agregarPedido(pedido) {
   hoja.setRowHeight(fila, 28);
 
   // Color especial en Estado pago
-  var celdaEstado = hoja.getRange(fila, 10);
+  var celdaEstado = hoja.getRange(fila, 8);
   if (estadoPago === "Pagado")    celdaEstado.setBackground("#d4edda").setFontColor("#155724");
   if (estadoPago === "Pendiente") celdaEstado.setBackground("#fff3cd").setFontColor("#856404");
   if (estadoPago === "Fallido")   celdaEstado.setBackground("#f8d7da").setFontColor("#721c24");
