@@ -8,7 +8,7 @@
     {%- endif -%}
 
     {%- if section.settings.titulo != blank -%}
-      <h2 class="studio-b2b__titulo" style="color: {{ section.settings.titulo_color }}; font-size: clamp(2.2rem, 5vw, {{ section.settings.titulo_tamano }});">
+      <h2 class="studio-b2b__titulo" style="color: {{ section.settings.titulo_color }}; font-size: clamp(2.2rem, 5vw, {{ section.settings.titulo_tamano }}); white-space: pre-line;">
         {{ section.settings.titulo }}
       </h2>
     {%- endif -%}
@@ -270,7 +270,7 @@
       "type": "textarea",
       "id": "titulo",
       "label": "Título (usa Enter para separar líneas)",
-      "default": "YOUR BRAND.\nOUR HANDS.\nONE PURPOSE."
+      "default": "YOUR BRAND. OUR HANDS. ONE PURPOSE."
     },
     {
       "type": "color",
