@@ -1,0 +1,443 @@
+<div class="studio-b2b" style="--bg-izq: {{ section.settings.fondo_izq }}; --bg-der: {{ section.settings.fondo_der }};">
+  <div class="studio-b2b__izq">
+
+    {%- if section.settings.etiqueta != blank -%}
+      <p class="studio-b2b__etiqueta" style="color: {{ section.settings.etiqueta_color }}; font-size: {{ section.settings.etiqueta_tamano }};">
+        {{ section.settings.etiqueta }}
+      </p>
+    {%- endif -%}
+
+    {%- if section.settings.titulo != blank -%}
+      <h2 class="studio-b2b__titulo" style="color: {{ section.settings.titulo_color }}; font-size: clamp(2.2rem, 5vw, {{ section.settings.titulo_tamano }});">
+        {{ section.settings.titulo }}
+      </h2>
+    {%- endif -%}
+
+    {%- if section.settings.cita != blank -%}
+      <p class="studio-b2b__cita" style="color: {{ section.settings.cita_color }}; font-size: {{ section.settings.cita_tamano }};">
+        {{ section.settings.cita }}
+      </p>
+    {%- endif -%}
+
+    <div class="studio-b2b__botones">
+      {%- if section.settings.btn1_texto != blank -%}
+        <a href="{{ section.settings.btn1_link | default: '#' }}"
+           class="studio-b2b__btn studio-b2b__btn--primario"
+           style="background: {{ section.settings.btn1_fondo }}; color: {{ section.settings.btn1_texto_color }}; border-color: {{ section.settings.btn1_fondo }};">
+          {{ section.settings.btn1_texto }}
+        </a>
+      {%- endif -%}
+      {%- if section.settings.btn2_texto != blank -%}
+        <a href="{{ section.settings.btn2_link | default: '#' }}"
+           class="studio-b2b__btn studio-b2b__btn--secundario"
+           style="color: {{ section.settings.btn2_color }}; border-color: {{ section.settings.btn2_color }};">
+          {{ section.settings.btn2_texto }}
+        </a>
+      {%- endif -%}
+    </div>
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="studio-b2b__stats">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'stat' -%}
+            <div class="studio-b2b__stat" {{ block.shopify_attributes }}>
+              <span class="studio-b2b__stat-num" style="color: {{ block.settings.numero_color }}; font-size: {{ block.settings.numero_tamano }};">{{ block.settings.numero }}</span>
+              <span class="studio-b2b__stat-label" style="color: {{ block.settings.label_color }}; font-size: {{ block.settings.label_tamano }};">{{ block.settings.label }}</span>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+
+  <div class="studio-b2b__der" style="background: {{ section.settings.fondo_der }};">
+    {%- if section.settings.imagen != blank -%}
+      <img src="{{ section.settings.imagen | image_url: width: 1200 }}"
+           alt="{{ section.settings.imagen.alt | default: 'Studio' }}"
+           class="studio-b2b__imagen"
+           loading="lazy">
+    {%- else -%}
+      <div class="studio-b2b__placeholder">
+        <p class="studio-b2b__placeholder-titulo" style="color: {{ section.settings.placeholder_color }};">{{ section.settings.placeholder_texto | default: 'WORKSHOP PHOTOGRAPHY HERE' }}</p>
+        {%- if section.settings.placeholder_tags != blank -%}
+          <p class="studio-b2b__placeholder-tags" style="color: {{ section.settings.placeholder_color }};">{{ section.settings.placeholder_tags }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .studio-b2b {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 80vh;
+  }
+
+  .studio-b2b__izq {
+    background: var(--bg-izq);
+    padding: 5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  .studio-b2b__etiqueta {
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    font-family: sans-serif;
+    margin: 0;
+  }
+
+  .studio-b2b__titulo {
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+    margin: 0;
+    font-family: sans-serif;
+  }
+
+  .studio-b2b__cita {
+    font-style: italic;
+    line-height: 1.6;
+    max-width: 440px;
+    margin: 0;
+  }
+
+  .studio-b2b__botones {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .studio-b2b__btn {
+    padding: 0.85rem 1.75rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-weight: 600;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+
+  .studio-b2b__btn:hover { opacity: 0.82; }
+
+  .studio-b2b__btn--primario { background: inherit; }
+  .studio-b2b__btn--secundario { background: transparent; }
+
+  .studio-b2b__stats {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+
+  .studio-b2b__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .studio-b2b__stat-num {
+    font-weight: 900;
+    font-family: sans-serif;
+    line-height: 1;
+  }
+
+  .studio-b2b__stat-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    font-family: sans-serif;
+    max-width: 120px;
+    line-height: 1.3;
+  }
+
+  .studio-b2b__der {
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .studio-b2b__imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  .studio-b2b__placeholder {
+    text-align: center;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .studio-b2b__placeholder-titulo {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    margin: 0;
+    opacity: 0.6;
+  }
+
+  .studio-b2b__placeholder-tags {
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    margin: 0;
+    opacity: 0.4;
+  }
+
+  @media screen and (max-width: 899px) {
+    .studio-b2b {
+      grid-template-columns: 1fr;
+    }
+    .studio-b2b__izq {
+      padding: 3rem 1.75rem;
+    }
+    .studio-b2b__der {
+      min-height: 320px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Studio B2B",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Fondos"
+    },
+    {
+      "type": "color",
+      "id": "fondo_izq",
+      "label": "Fondo columna izquierda",
+      "default": "#2D4A52"
+    },
+    {
+      "type": "color",
+      "id": "fondo_der",
+      "label": "Fondo columna derecha",
+      "default": "#E8D5C8"
+    },
+    {
+      "type": "header",
+      "content": "Etiqueta superior"
+    },
+    {
+      "type": "text",
+      "id": "etiqueta",
+      "label": "Etiqueta",
+      "default": "CREATE WITH US · B2B · MINIMUM 50 UNITS"
+    },
+    {
+      "type": "color",
+      "id": "etiqueta_color",
+      "label": "Color etiqueta",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "text",
+      "id": "etiqueta_tamano",
+      "label": "Tamaño etiqueta",
+      "default": "0.72rem"
+    },
+    {
+      "type": "header",
+      "content": "Título principal"
+    },
+    {
+      "type": "textarea",
+      "id": "titulo",
+      "label": "Título (usa Enter para separar líneas)",
+      "default": "YOUR BRAND.\nOUR HANDS.\nONE PURPOSE."
+    },
+    {
+      "type": "color",
+      "id": "titulo_color",
+      "label": "Color título",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "text",
+      "id": "titulo_tamano",
+      "label": "Tamaño máximo título",
+      "default": "4rem"
+    },
+    {
+      "type": "header",
+      "content": "Cita / descripción"
+    },
+    {
+      "type": "textarea",
+      "id": "cita",
+      "label": "Cita o descripción",
+      "default": "\"We see co-creation with our clients as an enriching process that allows us to deliver adapted products — fully customizable in size, style, and design.\""
+    },
+    {
+      "type": "color",
+      "id": "cita_color",
+      "label": "Color cita",
+      "default": "#C8D5D8"
+    },
+    {
+      "type": "text",
+      "id": "cita_tamano",
+      "label": "Tamaño cita",
+      "default": "0.95rem"
+    },
+    {
+      "type": "header",
+      "content": "Botón 1 (principal)"
+    },
+    {
+      "type": "text",
+      "id": "btn1_texto",
+      "label": "Texto botón 1",
+      "default": "VIEW PRODUCT CATALOG →"
+    },
+    {
+      "type": "url",
+      "id": "btn1_link",
+      "label": "Link botón 1"
+    },
+    {
+      "type": "color",
+      "id": "btn1_fondo",
+      "label": "Color fondo botón 1",
+      "default": "#C97B5A"
+    },
+    {
+      "type": "color",
+      "id": "btn1_texto_color",
+      "label": "Color texto botón 1",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Botón 2 (secundario)"
+    },
+    {
+      "type": "text",
+      "id": "btn2_texto",
+      "label": "Texto botón 2",
+      "default": "CONTACT US"
+    },
+    {
+      "type": "url",
+      "id": "btn2_link",
+      "label": "Link botón 2"
+    },
+    {
+      "type": "color",
+      "id": "btn2_color",
+      "label": "Color borde y texto botón 2",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "header",
+      "content": "Imagen derecha"
+    },
+    {
+      "type": "image_picker",
+      "id": "imagen",
+      "label": "Foto del taller / workshop"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_texto",
+      "label": "Texto placeholder (sin foto)",
+      "default": "WORKSHOP PHOTOGRAPHY HERE"
+    },
+    {
+      "type": "text",
+      "id": "placeholder_tags",
+      "label": "Tags placeholder",
+      "default": "TOTE BAGS · SCREEN PRINTING · ARTISANS AT WORK"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_color",
+      "label": "Color texto placeholder",
+      "default": "#6B5A52"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "stat",
+      "name": "Estadística",
+      "settings": [
+        {
+          "type": "text",
+          "id": "numero",
+          "label": "Número",
+          "default": "50+"
+        },
+        {
+          "type": "color",
+          "id": "numero_color",
+          "label": "Color número",
+          "default": "#C97B5A"
+        },
+        {
+          "type": "text",
+          "id": "numero_tamano",
+          "label": "Tamaño número",
+          "default": "2rem"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Descripción",
+          "default": "Min. units per order"
+        },
+        {
+          "type": "color",
+          "id": "label_color",
+          "label": "Color descripción",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "text",
+          "id": "label_tamano",
+          "label": "Tamaño descripción",
+          "default": "0.72rem"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Studio B2B",
+      "blocks": [
+        { "type": "stat", "settings": { "numero": "50+", "label": "Min. units per order" } },
+        { "type": "stat", "settings": { "numero": "3", "label": "Customization techniques" } },
+        { "type": "stat", "settings": { "numero": "30+", "label": "Women behind every piece" } }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}
