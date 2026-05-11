@@ -1,74 +1,27 @@
-<div class="marquee-banner" style="background: {{ section.settings.fondo }}; padding: {{ section.settings.padding_v }}px 0;">
-  <div class="marquee-banner__track">
-    <div class="marquee-banner__contenido" style="animation-duration: {{ section.settings.velocidad }}s;">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'item' -%}
-          <span class="marquee-banner__texto" style="color: {{ block.settings.color }}; font-size: {{ section.settings.tamano }}; font-family: {{ section.settings.fuente }}; font-weight: {{ section.settings.peso }}; letter-spacing: {{ section.settings.espaciado }}em;">
-            {{ block.settings.texto }}
-          </span>
-          <span class="marquee-banner__sep" style="color: {{ section.settings.sep_color }};">{{ section.settings.separador }}</span>
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
-    <div class="marquee-banner__contenido marquee-banner__contenido--copia" style="animation-duration: {{ section.settings.velocidad }}s;" aria-hidden="true">
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'item' -%}
-          <span class="marquee-banner__texto" style="color: {{ block.settings.color }}; font-size: {{ section.settings.tamano }}; font-family: {{ section.settings.fuente }}; font-weight: {{ section.settings.peso }}; letter-spacing: {{ section.settings.espaciado }}em;">
-            {{ block.settings.texto }}
-          </span>
-          <span class="marquee-banner__sep" style="color: {{ section.settings.sep_color }};">{{ section.settings.separador }}</span>
-        {%- endif -%}
-      {%- endfor -%}
-    </div>
+<div class="mq-wrap" style="background:{{ section.settings.fondo }}; padding:{{ section.settings.padding_v }}px 0; overflow:hidden; width:100%;">
+  <div class="mq-inner" style="animation: mq-slide {{ section.settings.velocidad }}s linear infinite; white-space:nowrap; display:inline-block;">
+    {%- assign items_html = '' -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'item' -%}
+        {%- capture item -%}
+          <span style="display:inline-block; color:{{ block.settings.color }}; font-size:{{ section.settings.tamano }}; font-family:{{ section.settings.fuente }}; font-weight:{{ section.settings.peso }}; letter-spacing:{{ section.settings.espaciado }}em; text-transform:uppercase; padding:0 0.5rem;">{{ block.settings.texto }}</span><span style="display:inline-block; color:{{ section.settings.sep_color }}; padding:0 0.6rem; opacity:0.8;">{{ section.settings.separador }}</span>
+        {%- endcapture -%}
+        {%- assign items_html = items_html | append: item -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {{ items_html }}{{ items_html }}{{ items_html }}{{ items_html }}
   </div>
 </div>
 
-{% stylesheet %}
-  .marquee-banner {
-    overflow: hidden;
-    width: 100%;
+<style>
+  @keyframes mq-slide {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
-
-  .marquee-banner__track {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    width: 100%;
-  }
-
-  .marquee-banner__contenido {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    flex-shrink: 0;
-    min-width: 100%;
-    white-space: nowrap;
-    animation: marquee-mover linear infinite;
-  }
-
-  @keyframes marquee-mover {
-    0%   { transform: translateX(0%); }
-    100% { transform: translateX(-100%); }
-  }
-
-  .marquee-banner__texto {
-    display: inline-block;
-    padding: 0 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .marquee-banner__sep {
-    display: inline-block;
-    opacity: 0.8;
-    flex-shrink: 0;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .marquee-banner__contenido { animation: none; }
+    .mq-inner { animation: none !important; }
   }
-{% endstylesheet %}
+</style>
 
 {% schema %}
 {
