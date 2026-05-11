@@ -31,37 +31,38 @@
 
   .marquee-banner__track {
     display: flex;
-    width: 100%;
+    flex-direction: row;
+    flex-wrap: nowrap;
     overflow: hidden;
+    width: 100%;
   }
 
   .marquee-banner__contenido {
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: 0;
     flex-shrink: 0;
+    min-width: 100%;
     white-space: nowrap;
-    animation: marquee-scroll linear infinite;
+    animation: marquee-mover linear infinite;
   }
 
-  .marquee-banner__contenido--copia {
-    animation: marquee-scroll linear infinite;
-  }
-
-  @keyframes marquee-scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-100%); }
+  @keyframes marquee-mover {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
   }
 
   .marquee-banner__texto {
     display: inline-block;
-    padding: 0 0.5rem;
+    padding: 0 0.75rem;
+    text-transform: uppercase;
   }
 
   .marquee-banner__sep {
     display: inline-block;
-    padding: 0 0.75rem;
-    opacity: 0.7;
+    opacity: 0.8;
+    flex-shrink: 0;
   }
 
   @media (prefers-reduced-motion: reduce) {
