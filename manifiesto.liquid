@@ -1,163 +1,74 @@
+<div class="manif" style="background: {{ section.settings.fondo }}; padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 6rem);">
 
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div
-  class="manifiesto section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }} spacing-style"
-  style="{% render 'spacing-style', settings: section.settings %}"
->
-  <div class="manifiesto__grid">
+  {%- if section.settings.etiqueta != blank -%}
+    <p class="manif__etiqueta" style="color: {{ section.settings.etiqueta_color }};">
+      {{ section.settings.etiqueta }}
+    </p>
+  {%- endif -%}
 
-    {%- comment -%} Columna izquierda {%- endcomment -%}
-    <div class="manifiesto__left">
-
-      {%- if section.settings.etiqueta != blank -%}
-        <p class="manifiesto__etiqueta" style="color: {{ section.settings.etiqueta_color }}; font-size: {{ section.settings.etiqueta_tamano }}; font-family: {{ section.settings.etiqueta_fuente }};">{{ section.settings.etiqueta }}</p>
+  {%- if section.settings.titulo_antes != blank or section.settings.titulo_destacado != blank or section.settings.titulo_despues != blank -%}
+    <h2 class="manif__titulo" style="color: {{ section.settings.titulo_color }}; font-size: clamp(2.4rem, 6vw, {{ section.settings.titulo_tamano }}); font-family: {{ section.settings.titulo_fuente }}; font-weight: {{ section.settings.titulo_peso }};">
+      {%- if section.settings.titulo_antes != blank -%}
+        {{ section.settings.titulo_antes }}<br>
       {%- endif -%}
-
-      {%- if section.settings.frase_principal != blank -%}
-        <h2 class="manifiesto__frase rte" style="color: {{ section.settings.frase_color }}; font-size: {{ section.settings.frase_tamano }}; font-family: {{ section.settings.frase_fuente }}; font-weight: {{ section.settings.frase_peso }};">{{ section.settings.frase_principal }}</h2>
+      {%- if section.settings.titulo_destacado != blank -%}
+        <em style="color: {{ section.settings.destacado_color }}; font-style: italic;">{{ section.settings.titulo_destacado }}</em><br>
       {%- endif -%}
-
-      {%- if section.settings.cita != blank -%}
-        <div class="manifiesto__cita-wrap" style="border-left-color: {{ section.settings.cita_borde_color }}; border-left-width: {{ section.settings.cita_borde_grosor }}px;">
-          <p class="manifiesto__cita" style="color: {{ section.settings.cita_color }}; font-size: {{ section.settings.cita_tamano }}; font-family: {{ section.settings.cita_fuente }}; font-style: italic;">{{ section.settings.cita }}</p>
-        </div>
+      {%- if section.settings.titulo_despues != blank -%}
+        {{ section.settings.titulo_despues }}
       {%- endif -%}
+    </h2>
+  {%- endif -%}
 
-      {%- if section.settings.firma != blank -%}
-        <div class="manifiesto__firma-wrap">
-          {%- if section.settings.firma_decoracion -%}
-            <div class="manifiesto__firma-linea" style="background: linear-gradient(to right, {{ section.settings.color_destacado }}, {{ section.settings.cita_borde_color }});"></div>
-          {%- endif -%}
-          <p class="manifiesto__firma" style="color: {{ section.settings.firma_color }}; font-size: {{ section.settings.firma_tamano }}; font-family: {{ section.settings.firma_fuente }}; letter-spacing: 0.1em;">{{ section.settings.firma }}</p>
-        </div>
-      {%- endif -%}
+  {%- if section.settings.descripcion != blank -%}
+    <p class="manif__desc" style="color: {{ section.settings.desc_color }}; font-size: {{ section.settings.desc_tamano }};">
+      {{ section.settings.descripcion }}
+    </p>
+  {%- endif -%}
 
-    </div>
+  {%- if section.settings.boton_texto != blank -%}
+    <a class="manif__boton" href="{{ section.settings.boton_link | default: '#' }}" style="color: {{ section.settings.boton_color }};">
+      {{ section.settings.boton_texto }} &rarr;
+    </a>
+  {%- endif -%}
 
-    {%- comment -%} Columna derecha — pills/tags interactivas {%- endcomment -%}
-    <div class="manifiesto__right">
-      {%- for block in section.blocks -%}
-        <button
-          class="manifiesto__pill{% if block.settings.activo %} manifiesto__pill--activo{% endif %}"
-          style="
-            --pill-color-activo: {{ block.settings.color_activo }};
-            --pill-texto-activo: {{ block.settings.texto_activo }};
-            --pill-color-inactivo: {{ section.settings.pill_fondo_inactivo }};
-            --pill-texto-inactivo: {{ section.settings.pill_color_inactivo }};
-            --pill-borde: {{ section.settings.pill_borde_color }};
-            font-size: {{ section.settings.pill_tamano }};
-            font-family: {{ section.settings.pill_fuente }};
-            border-radius: {{ section.settings.pill_radio }}px;
-          "
-          {{ block.shopify_attributes }}
-        >
-          {{ block.settings.texto }}
-        </button>
-      {%- endfor -%}
-    </div>
-
-  </div>
 </div>
 
-
 {% stylesheet %}
-  .manifiesto__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-    align-items: center;
+  .manif__etiqueta {
+    margin: 0 0 1.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: sans-serif;
   }
 
-  @media screen and (min-width: 750px) {
-    .manifiesto__grid {
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 5rem;
-    }
+  .manif__titulo {
+    margin: 0 0 2rem;
+    line-height: 1.15;
+    max-width: 700px;
   }
 
-  .manifiesto__left {
-    display: flex;
-    flex-direction: column;
-    gap: 1.75rem;
+  .manif__desc {
+    margin: 0 0 2.5rem;
+    line-height: 1.75;
+    max-width: 580px;
   }
 
-  .manifiesto__etiqueta {
-    margin: 0;
+  .manif__boton {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 0.78rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    font-family: sans-serif;
+    font-weight: 600;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+    transition: opacity 0.2s;
   }
 
-  .manifiesto__frase {
-    margin: 0;
-    line-height: 1.2;
-  }
-
-  .manifiesto__frase p { margin: 0; }
-
-  .manifiesto__cita-wrap {
-    border-left: 3px solid;
-    padding-left: 1.25rem;
-  }
-
-  .manifiesto__cita {
-    margin: 0;
-    line-height: 1.7;
-  }
-
-  .manifiesto__firma-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    padding-top: 0.5rem;
-  }
-
-  .manifiesto__firma-linea {
-    height: 2px;
-    width: 60px;
-    border-radius: 2px;
-  }
-
-  .manifiesto__firma {
-    margin: 0;
-    text-transform: uppercase;
-  }
-
-  /* Pills lado derecho */
-  .manifiesto__right {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.85rem;
-  }
-
-  @media screen and (min-width: 750px) {
-    .manifiesto__right {
-      align-items: flex-end;
-    }
-  }
-
-  .manifiesto__pill {
-    cursor: default;
-    padding: 0.65rem 1.5rem;
-    border: 1px solid var(--pill-borde);
-    background-color: var(--pill-color-inactivo);
-    color: var(--pill-texto-inactivo);
-    border-radius: var(--pill-radio, 50px);
-    transition: background-color 0.25s, color 0.25s, border-color 0.25s;
-    white-space: nowrap;
-  }
-
-  .manifiesto__pill:hover {
-    background-color: var(--pill-color-activo);
-    color: var(--pill-texto-activo);
-    border-color: var(--pill-color-activo);
-  }
-
-  .manifiesto__pill--activo {
-    background-color: var(--pill-color-activo);
-    color: var(--pill-texto-activo);
-    border-color: var(--pill-color-activo);
-  }
+  .manif__boton:hover { opacity: 0.7; }
 {% endstylesheet %}
 
 {% schema %}
@@ -166,39 +77,13 @@
   "tag": "section",
   "class": "section-wrapper",
   "disabled_on": { "groups": ["header", "footer"] },
-  "blocks": [
-    {
-      "type": "pill",
-      "name": "Valor / Pill",
-      "settings": [
-        {
-          "type": "text",
-          "id": "texto",
-          "label": "Texto",
-          "default": "Noble Humans"
-        },
-        {
-          "type": "checkbox",
-          "id": "activo",
-          "label": "Mostrar como activo por defecto",
-          "default": false
-        },
-        {
-          "type": "color",
-          "id": "color_activo",
-          "label": "Color fondo activo",
-          "default": "#C97B5A"
-        },
-        {
-          "type": "color",
-          "id": "texto_activo",
-          "label": "Color texto activo",
-          "default": "#ffffff"
-        }
-      ]
-    }
-  ],
   "settings": [
+    {
+      "type": "color",
+      "id": "fondo",
+      "label": "Color de fondo",
+      "default": "#0D0D0D"
+    },
     {
       "type": "header",
       "content": "Etiqueta"
@@ -206,113 +91,104 @@
     {
       "type": "text",
       "id": "etiqueta",
-      "label": "Texto",
+      "label": "Texto etiqueta",
       "default": "OUR REASON FOR BEING"
     },
     {
       "type": "color",
       "id": "etiqueta_color",
-      "label": "Color",
-      "default": "#999999"
-    },
-    {
-      "type": "select",
-      "id": "etiqueta_tamano",
-      "label": "Tamaño",
-      "options": [
-        { "value": "0.625rem", "label": "10px" },
-        { "value": "0.75rem", "label": "12px" },
-        { "value": "0.875rem", "label": "14px" }
-      ],
-      "default": "0.75rem"
-    },
-    {
-      "type": "select",
-      "id": "etiqueta_fuente",
-      "label": "Fuente",
-      "options": [
-        { "value": "var(--font-body--family)", "label": "Cuerpo" },
-        { "value": "var(--font-heading--family)", "label": "Título" },
-        { "value": "var(--font-accent--family)", "label": "Acento" }
-      ],
-      "default": "var(--font-body--family)"
+      "label": "Color etiqueta",
+      "default": "#888888"
     },
     {
       "type": "header",
-      "content": "Frase principal"
+      "content": "Titulo"
     },
     {
-      "type": "richtext",
-      "id": "frase_principal",
-      "label": "Frase",
-      "default": "<p>\"Every bag begins<br>with the name of <em>a woman.\"</em></p>",
-      "info": "Usa cursiva y colores desde la barra de herramientas"
+      "type": "text",
+      "id": "titulo_antes",
+      "label": "Texto antes de la palabra destacada",
+      "default": "Not a charity. Not a project. A"
+    },
+    {
+      "type": "text",
+      "id": "titulo_destacado",
+      "label": "Palabra destacada (en cursiva y color)",
+      "default": "business"
     },
     {
       "type": "color",
-      "id": "frase_color",
-      "label": "Color",
-      "default": "#2C2C2C"
-    },
-    {
-      "type": "color",
-      "id": "color_destacado",
-      "label": "Color destacado (palabra en cursiva)",
+      "id": "destacado_color",
+      "label": "Color palabra destacada",
       "default": "#C97B5A"
     },
     {
-      "type": "select",
-      "id": "frase_tamano",
-      "label": "Tamaño",
-      "options": [
-        { "value": "1.5rem", "label": "24px" },
-        { "value": "2rem", "label": "32px" },
-        { "value": "2.5rem", "label": "40px" },
-        { "value": "clamp(1.75rem, 3.5vw, 3rem)", "label": "Fluido" }
-      ],
-      "default": "clamp(1.75rem, 3.5vw, 3rem)"
+      "type": "text",
+      "id": "titulo_despues",
+      "label": "Texto despues de la palabra destacada",
+      "default": "built on craft."
+    },
+    {
+      "type": "color",
+      "id": "titulo_color",
+      "label": "Color titulo",
+      "default": "#FFFFFF"
     },
     {
       "type": "select",
-      "id": "frase_fuente",
-      "label": "Fuente",
+      "id": "titulo_tamano",
+      "label": "Tamano maximo titulo",
       "options": [
-        { "value": "var(--font-body--family)", "label": "Cuerpo" },
-        { "value": "var(--font-heading--family)", "label": "Título" },
-        { "value": "var(--font-accent--family)", "label": "Acento" }
+        { "value": "3rem", "label": "3rem" },
+        { "value": "4rem", "label": "4rem" },
+        { "value": "5rem", "label": "5rem" },
+        { "value": "6rem", "label": "6rem" }
+      ],
+      "default": "5rem"
+    },
+    {
+      "type": "select",
+      "id": "titulo_fuente",
+      "label": "Fuente titulo",
+      "options": [
+        { "value": "var(--font-heading--family)", "label": "Titulo del tema" },
+        { "value": "var(--font-body--family)", "label": "Cuerpo del tema" },
+        { "value": "serif", "label": "Serif" },
+        { "value": "sans-serif", "label": "Sans-serif" }
       ],
       "default": "var(--font-heading--family)"
     },
     {
       "type": "select",
-      "id": "frase_peso",
-      "label": "Peso",
+      "id": "titulo_peso",
+      "label": "Peso fuente",
       "options": [
         { "value": "400", "label": "Normal" },
-        { "value": "600", "label": "Semi-negrita" }
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
       ],
       "default": "400"
     },
     {
       "type": "header",
-      "content": "Cita secundaria"
+      "content": "Descripcion"
     },
     {
       "type": "textarea",
-      "id": "cita",
-      "label": "Texto",
-      "default": "\"Patience, the greatest of sciences.\nDrive, the greatest of energies.\""
+      "id": "descripcion",
+      "label": "Texto descripcion",
+      "default": "mi eelo was born inside the community surrounding the largest landfill in Central America. We don't ask for sympathy - we build products. Real skill. Real pay. Real women deciding their own future."
     },
     {
       "type": "color",
-      "id": "cita_color",
-      "label": "Color",
-      "default": "#C97B5A"
+      "id": "desc_color",
+      "label": "Color descripcion",
+      "default": "#AAAAAA"
     },
     {
       "type": "select",
-      "id": "cita_tamano",
-      "label": "Tamaño",
+      "id": "desc_tamano",
+      "label": "Tamano descripcion",
       "options": [
         { "value": "0.875rem", "label": "14px" },
         { "value": "1rem", "label": "16px" },
@@ -321,161 +197,30 @@
       "default": "1rem"
     },
     {
-      "type": "select",
-      "id": "cita_fuente",
-      "label": "Fuente",
-      "options": [
-        { "value": "var(--font-body--family)", "label": "Cuerpo" },
-        { "value": "var(--font-heading--family)", "label": "Título" },
-        { "value": "var(--font-accent--family)", "label": "Acento" }
-      ],
-      "default": "var(--font-heading--family)"
-    },
-    {
-      "type": "color",
-      "id": "cita_borde_color",
-      "label": "Color del borde izquierdo",
-      "default": "#C97B5A"
-    },
-    {
-      "type": "range",
-      "id": "cita_borde_grosor",
-      "label": "Grosor del borde",
-      "min": 1,
-      "max": 6,
-      "step": 1,
-      "unit": "px",
-      "default": 3
-    },
-    {
       "type": "header",
-      "content": "Firma"
+      "content": "Boton"
     },
     {
       "type": "text",
-      "id": "firma",
-      "label": "Texto",
-      "default": "MI EELO · GUATEMALA CITY · SINCE 2017"
+      "id": "boton_texto",
+      "label": "Texto boton",
+      "default": "SEE OUR IMPACT"
+    },
+    {
+      "type": "url",
+      "id": "boton_link",
+      "label": "Link boton"
     },
     {
       "type": "color",
-      "id": "firma_color",
-      "label": "Color",
-      "default": "#aaaaaa"
-    },
-    {
-      "type": "select",
-      "id": "firma_tamano",
-      "label": "Tamaño",
-      "options": [
-        { "value": "0.625rem", "label": "10px" },
-        { "value": "0.75rem", "label": "12px" },
-        { "value": "0.875rem", "label": "14px" }
-      ],
-      "default": "0.75rem"
-    },
-    {
-      "type": "select",
-      "id": "firma_fuente",
-      "label": "Fuente",
-      "options": [
-        { "value": "var(--font-body--family)", "label": "Cuerpo" },
-        { "value": "var(--font-heading--family)", "label": "Título" },
-        { "value": "var(--font-accent--family)", "label": "Acento" }
-      ],
-      "default": "var(--font-body--family)"
-    },
-    {
-      "type": "checkbox",
-      "id": "firma_decoracion",
-      "label": "Mostrar línea decorativa",
-      "default": true
-    },
-    {
-      "type": "header",
-      "content": "Pills / Valores"
-    },
-    {
-      "type": "color",
-      "id": "pill_fondo_inactivo",
-      "label": "Fondo inactivo",
-      "default": "#00000000"
-    },
-    {
-      "type": "color",
-      "id": "pill_color_inactivo",
-      "label": "Color texto inactivo",
-      "default": "#3A3A3A"
-    },
-    {
-      "type": "color",
-      "id": "pill_borde_color",
-      "label": "Color borde",
-      "default": "#3A3A3A"
-    },
-    {
-      "type": "range",
-      "id": "pill_radio",
-      "label": "Bordes redondeados",
-      "min": 0,
-      "max": 50,
-      "step": 2,
-      "unit": "px",
-      "default": 50
-    },
-    {
-      "type": "select",
-      "id": "pill_tamano",
-      "label": "Tamaño texto",
-      "options": [
-        { "value": "0.75rem", "label": "12px" },
-        { "value": "0.875rem", "label": "14px" },
-        { "value": "1rem", "label": "16px" }
-      ],
-      "default": "0.875rem"
-    },
-    {
-      "type": "select",
-      "id": "pill_fuente",
-      "label": "Fuente",
-      "options": [
-        { "value": "var(--font-body--family)", "label": "Cuerpo" },
-        { "value": "var(--font-heading--family)", "label": "Título" },
-        { "value": "var(--font-accent--family)", "label": "Acento" }
-      ],
-      "default": "var(--font-body--family)"
-    },
-    {
-      "type": "header",
-      "content": "Estilo"
-    },
-    {
-      "type": "select",
-      "id": "section_width",
-      "label": "Ancho",
-      "options": [
-        { "value": "page-width", "label": "Página" },
-        { "value": "full-width", "label": "Completo" }
-      ],
-      "default": "page-width"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Esquema de color",
-      "default": "scheme-1"
+      "id": "boton_color",
+      "label": "Color boton",
+      "default": "#C97B5A"
     }
   ],
   "presets": [
     {
-      "name": "Manifiesto",
-      "blocks": [
-        { "type": "pill", "settings": { "texto": "Noble Humans", "activo": false } },
-        { "type": "pill", "settings": { "texto": "Honest Materials", "activo": true } },
-        { "type": "pill", "settings": { "texto": "Made in Guatemala", "activo": false } },
-        { "type": "pill", "settings": { "texto": "1 product = 1 opportunity", "activo": false } },
-        { "type": "pill", "settings": { "texto": "Co-creation", "activo": false } }
-      ]
+      "name": "Manifiesto"
     }
   ]
 }
