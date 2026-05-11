@@ -1,0 +1,186 @@
+<div class="marquee-banner" style="background: {{ section.settings.fondo }}; padding: {{ section.settings.padding_v }}px 0;">
+  <div class="marquee-banner__track">
+    <div class="marquee-banner__contenido" style="animation-duration: {{ section.settings.velocidad }}s;">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'item' -%}
+          <span class="marquee-banner__texto" style="color: {{ block.settings.color }}; font-size: {{ section.settings.tamano }}; font-family: {{ section.settings.fuente }}; font-weight: {{ section.settings.peso }}; letter-spacing: {{ section.settings.espaciado }}em;">
+            {{ block.settings.texto }}
+          </span>
+          <span class="marquee-banner__sep" style="color: {{ section.settings.sep_color }};">{{ section.settings.separador }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+    <div class="marquee-banner__contenido marquee-banner__contenido--copia" style="animation-duration: {{ section.settings.velocidad }}s;" aria-hidden="true">
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'item' -%}
+          <span class="marquee-banner__texto" style="color: {{ block.settings.color }}; font-size: {{ section.settings.tamano }}; font-family: {{ section.settings.fuente }}; font-weight: {{ section.settings.peso }}; letter-spacing: {{ section.settings.espaciado }}em;">
+            {{ block.settings.texto }}
+          </span>
+          <span class="marquee-banner__sep" style="color: {{ section.settings.sep_color }};">{{ section.settings.separador }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .marquee-banner {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .marquee-banner__track {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .marquee-banner__contenido {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+    animation: marquee-scroll linear infinite;
+  }
+
+  .marquee-banner__contenido--copia {
+    animation: marquee-scroll linear infinite;
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
+  }
+
+  .marquee-banner__texto {
+    display: inline-block;
+    padding: 0 0.5rem;
+  }
+
+  .marquee-banner__sep {
+    display: inline-block;
+    padding: 0 0.75rem;
+    opacity: 0.7;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-banner__contenido { animation: none; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Marquee Banner",
+  "tag": "section",
+  "settings": [
+    {
+      "type": "color",
+      "id": "fondo",
+      "label": "Color de fondo",
+      "default": "#E8957A"
+    },
+    {
+      "type": "range",
+      "id": "padding_v",
+      "label": "Altura (padding vertical)",
+      "min": 6,
+      "max": 40,
+      "step": 2,
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "velocidad",
+      "label": "Velocidad (segundos por vuelta)",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "default": 22
+    },
+    {
+      "type": "text",
+      "id": "separador",
+      "label": "Separador entre palabras",
+      "default": "•"
+    },
+    {
+      "type": "color",
+      "id": "sep_color",
+      "label": "Color separador",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "text",
+      "id": "tamano",
+      "label": "Tamaño de texto",
+      "default": "0.75rem"
+    },
+    {
+      "type": "select",
+      "id": "fuente",
+      "label": "Fuente",
+      "options": [
+        { "value": "sans-serif", "label": "Sans-serif" },
+        { "value": "serif", "label": "Serif" },
+        { "value": "inherit", "label": "Del tema" }
+      ],
+      "default": "sans-serif"
+    },
+    {
+      "type": "select",
+      "id": "peso",
+      "label": "Peso de fuente",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra-bold" }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "text",
+      "id": "espaciado",
+      "label": "Espaciado entre letras (em)",
+      "default": "0.12"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Texto",
+      "settings": [
+        {
+          "type": "text",
+          "id": "texto",
+          "label": "Texto",
+          "default": "Honest Materials"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "Color texto",
+          "default": "#FFFFFF"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Banner",
+      "blocks": [
+        { "type": "item", "settings": { "texto": "Honest Materials" } },
+        { "type": "item", "settings": { "texto": "Made in Guatemala" } },
+        { "type": "item", "settings": { "texto": "1 Product = 1 Opportunity" } },
+        { "type": "item", "settings": { "texto": "Co-Creation" } },
+        { "type": "item", "settings": { "texto": "Skill, no Pity" } },
+        { "type": "item", "settings": { "texto": "Noble Humans" } }
+      ]
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}
